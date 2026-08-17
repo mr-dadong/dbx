@@ -218,6 +218,7 @@ let viewportEmitFrame: number | null = null;
 let viewportRestoreFrame: number | null = null;
 let latestViewport: { scrollTop: number; scrollLeft: number } | undefined = props.initialViewport;
 let lastEmittedViewport: { scrollTop: number; scrollLeft: number } | undefined = props.initialViewport;
+let preserveViewportAfterGutterExecution = false;
 let latestSelection: { anchor: number; head: number } | undefined = props.initialSelection;
 const connectionStore = useConnectionStore();
 const settingsStore = useSettingsStore();
@@ -1661,8 +1662,11 @@ function executeSqlStatementFromGutter(currentView: EditorViewType, line: { from
   event.stopPropagation();
   // Gutter play is always scoped to the statement/command for that line, even
   // when the main editor execute action would run the full document.
+  // 记录本次来自行前按钮，执行结束后不要把界面滚动到旧光标所在行。
+  preserveViewportAfterGutterExecution = true;
   emitExecutionRequest(sqlExecutionSnapshotForRange(currentView, statementRange));
-  currentView.focus();
+  // 不主动聚焦编辑器，否则 CodeMirror 会把屏幕滚回之前的光标位置。
+  // currentView.focus();
   return true;
 }
 
@@ -5724,6 +5728,11 @@ function openReplace(): boolean {
 
 function scrollCursorIntoView() {
   if (!view.value || !editorViewModule || !editorIsActive) return;
+  if (preserveViewportAfterGutterExecution) {
+    // 行前按钮执行 SQL 时，用户当前看到的位置比旧光标位置更重要。
+    preserveViewportAfterGutterExecution = false;
+    return;
+  }
   const pos = view.value.state.selection.main.head;
   // Use "center" rather than "nearest": by the time this runs, the results pane has already
   // opened/resized and shrunk the editor viewport, so the cursor's old position is often no
