@@ -606,6 +606,13 @@ GET /_cat/indices`;
     expect(range?.sql.trim()).toBe("SELECT 1");
   });
 
+  it("returns the current statement after a multiline trailing block comment", () => {
+    const sql = "SELECT 1; /* 第一行\n第二行 */\nSELECT 2;";
+    const pos = sql.indexOf("*/") + 2;
+    const range = statementRangeAtCursor(sql, pos);
+    expect(range?.sql.trim()).toBe("SELECT 1");
+  });
+
   it("still returns the next statement when the cursor is at the start of its line after a trailing comment", () => {
     // 回归：换行后的光标不再归属上一条语句
     const sql = "SELECT 1; -- 114808\nSELECT 2; -- 127923";
