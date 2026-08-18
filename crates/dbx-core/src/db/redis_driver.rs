@@ -2074,8 +2074,8 @@ where
 
 /// Batch-scan keys with server-side multi-SCAN support.
 ///
-/// Performs up to `max_iterations` SCAN cycles in a single call. TYPE metadata
-/// is optional so large key-name searches can avoid extra Redis work.
+/// Performs up to `max_iterations` SCAN cycles in a single call. TYPE and TTL
+/// metadata is optional so large key-name searches can avoid extra Redis work.
 /// DBSIZE is only called on the first iteration (cursor == 0).
 pub async fn scan_keys_batch<C>(
     con: &mut C,
@@ -2116,6 +2116,13 @@ where
                 } else {
                     String::new()
                 };
+                // 精确命中单个 key 时顺带查询一次 TTL（O(1) 命令），
+                // 让前端列表行无需再点开 key 就能看到过期信息。
+                let key_ttl: i64 = if include_types {
+                    redis::cmd("TTL").arg(pattern).query_async(con).await.unwrap_or(-2)
+                } else {
+                    -2
+                };
 
                 let value_preview = if include_types { redis_key_value_preview(&key_type) } else { String::new() };
 
@@ -2123,7 +2130,7 @@ where
                     key_display: redis_key_bytes_to_display(pattern.as_bytes()),
                     key_raw: redis_key_bytes_to_raw(pattern.as_bytes()),
                     key_type,
-                    ttl: -2,
+                    ttl: key_ttl,
                     size: 0,
                     value_preview,
                 };
@@ -2154,14 +2161,32 @@ where
         let (next_cursor, keys) = parse_scan_keys(raw)?;
 
         if !keys.is_empty() {
-            let key_types: Vec<String> = if include_types {
+            // 同一条 pipeline 先批量查 TYPE 再批量查 TTL：两条都是 O(1) 命令，
+            // 合并后仍只有一次网络往返，避免逐 key 查询（N+1）。
+            // TTL 是列表页展示过期信息的数据来源；include_types=false 的
+            // 全量拉取链路（百万 key 场景）完全不发这两类命令，保持零额外开销。
+            let (key_types, key_ttls): (Vec<String>, Vec<i64>) = if include_types {
+                let key_count = keys.len();
                 let mut pipe = redis::pipe();
                 for key in &keys {
                     pipe.cmd("TYPE").arg(key);
                 }
-                pipe.query_async(con).await.unwrap_or_default()
+                for key in &keys {
+                    pipe.cmd("TTL").arg(key);
+                }
+                // TYPE 返回状态字符串、TTL 返回整数，返回类型不同，
+                // 因此先按 Redis 原始值整体接收，再按“前 N 个 TYPE、后 N 个 TTL”拆开解析。
+                let values: Vec<RedisRawValue> = pipe.query_async(con).await.unwrap_or_default();
+                let types = values
+                    .iter()
+                    .take(key_count)
+                    .map(|value| String::from_redis_value(value).unwrap_or_else(|_| "unknown".to_string()))
+                    .collect();
+                let ttls =
+                    values.iter().skip(key_count).map(|value| i64::from_redis_value(value).unwrap_or(-2)).collect();
+                (types, ttls)
             } else {
-                Vec::new()
+                (Vec::new(), Vec::new())
             };
 
             for (index, key) in keys.iter().enumerate() {
@@ -2179,7 +2204,8 @@ where
                     key_display: redis_key_bytes_to_display(key),
                     key_raw: redis_key_bytes_to_raw(key),
                     key_type,
-                    ttl: -2,
+                    // -1 表示永不过期；-2 表示本次未查询到 TTL（pipeline 失败或被跳过）
+                    ttl: key_ttls.get(index).copied().unwrap_or(-2),
                     size: 0,
                     value_preview,
                 });
@@ -4358,6 +4384,65 @@ mod tests {
         assert_eq!(result.keys[0].key_display, key);
         assert_eq!(result.keys[0].key_raw, redis_key_bytes_to_raw(key.as_bytes()));
         assert_eq!(con.command_count("SCAN"), 2);
+    }
+
+    #[tokio::test]
+    async fn scan_keys_batch_pipelines_ttl_alongside_types() {
+        let mut con = FakeRedisConnection::new(vec![
+            RedisRawValue::Int(2),
+            scan_response("0", vec!["session:a", "cache:b"]),
+            // pipeline 内前 N 个响应是 TYPE，后 N 个是 TTL
+            RedisRawValue::SimpleString("string".to_string()),
+            RedisRawValue::SimpleString("hash".to_string()),
+            RedisRawValue::Int(-1),
+            RedisRawValue::Int(3600),
+        ]);
+
+        let result = super::scan_keys_batch(&mut con, 0, "*", 100, 1, true).await.unwrap();
+
+        assert_eq!(result.keys.len(), 2);
+        assert_eq!(result.keys[0].key_type, "string");
+        assert_eq!(result.keys[0].ttl, -1);
+        assert_eq!(result.keys[1].key_type, "hash");
+        assert_eq!(result.keys[1].ttl, 3600);
+        // FakeRedisConnection 按打包请求数统计，TYPE/TTL 同在一条 pipeline 里；
+        // 这里直接统计打包内容中命令出现的次数，验证两类命令各批量发送了 2 次
+        let pipeline_packed = con.commands.iter().find(|packed| packed.contains("\r\nTYPE\r\n")).cloned().unwrap();
+        assert_eq!(pipeline_packed.matches("\r\nTYPE\r\n").count(), 2);
+        assert_eq!(pipeline_packed.matches("\r\nTTL\r\n").count(), 2);
+    }
+
+    #[tokio::test]
+    async fn scan_keys_batch_skips_type_and_ttl_when_metadata_disabled() {
+        // include_types=false 是“加载全部”的百万 key 链路，不能多发出任何 TYPE/TTL 命令
+        let mut con = FakeRedisConnection::new(vec![RedisRawValue::Int(1), scan_response("0", vec!["cache:b"])]);
+
+        let result = super::scan_keys_batch(&mut con, 0, "*", 100, 1, false).await.unwrap();
+
+        assert_eq!(result.keys.len(), 1);
+        assert_eq!(result.keys[0].key_type, "");
+        assert_eq!(result.keys[0].ttl, -2);
+        assert_eq!(con.command_count("TYPE"), 0);
+        assert_eq!(con.command_count("TTL"), 0);
+    }
+
+    #[tokio::test]
+    async fn scan_keys_batch_exact_match_returns_ttl() {
+        let mut con = FakeRedisConnection::new(vec![
+            RedisRawValue::Int(1),
+            RedisRawValue::Int(1),
+            RedisRawValue::SimpleString("string".to_string()),
+            RedisRawValue::Int(-1),
+        ]);
+
+        let result = super::scan_keys_batch(&mut con, 0, "session:a", 100, 1, true).await.unwrap();
+
+        assert_eq!(result.keys.len(), 1);
+        assert_eq!(result.keys[0].key_display, "session:a");
+        assert_eq!(result.keys[0].key_type, "string");
+        assert_eq!(result.keys[0].ttl, -1);
+        assert_eq!(con.command_count("EXISTS"), 1);
+        assert_eq!(con.command_count("TTL"), 1);
     }
 
     #[tokio::test]
