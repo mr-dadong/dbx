@@ -81,16 +81,39 @@ describe("queryStore hidden primary key editing", () => {
     const { clearTableMetadataCache } = await import("@/lib/metadata/tableMetadataCache");
     clearTableMetadataCache();
     setActivePinia(createPinia());
-    getConnectionConfig.mockReturnValue({ id: "mysql-1", name: "MySQL", db_type: "mysql", database: "app", query_timeout_secs: 30 });
+    getConnectionConfig.mockReturnValue({
+      id: "mysql-1",
+      name: "MySQL",
+      db_type: "mysql",
+      database: "app",
+      query_timeout_secs: 30,
+    });
     getColumns.mockResolvedValue([
-      { name: "id", data_type: "int", is_nullable: false, column_default: null, is_primary_key: true, extra: null },
-      { name: "name", data_type: "varchar", is_nullable: true, column_default: null, is_primary_key: false, extra: null },
+      {
+        name: "id",
+        data_type: "int",
+        is_nullable: false,
+        column_default: null,
+        is_primary_key: true,
+        extra: null,
+      },
+      {
+        name: "name",
+        data_type: "varchar",
+        is_nullable: true,
+        column_default: null,
+        is_primary_key: false,
+        extra: null,
+      },
     ]);
     listIndexes.mockResolvedValue([]);
     listObjects.mockResolvedValue([]);
     lookupLocalCompletionTables.mockReturnValue([]);
     analyzeEditableQueryEditability.mockImplementation(async (sql: string) => queryAnalysis(sql));
-    buildSortedQuerySql.mockImplementation(async (options) => ({ ok: true, sql: `${options.originalSql} ORDER BY ${options.column} ${options.direction.toUpperCase()}` }));
+    buildSortedQuerySql.mockImplementation(async (options) => ({
+      ok: true,
+      sql: `${options.originalSql} ORDER BY ${options.column} ${options.direction.toUpperCase()}`,
+    }));
     buildDataGridCountSql.mockResolvedValue("SELECT COUNT(*) FROM `users`");
     prepareQueryPaginationExecutionPlan.mockImplementation(async (options) => ({
       sqlToExecute: options.sql,
@@ -141,9 +164,30 @@ describe("queryStore hidden primary key editing", () => {
   it("keeps MySQL expression columns read-only without disabling direct columns", async () => {
     const sql = "SELECT id, status, extra->>'$.mode' mode, extra->>'$.template' tmpl FROM items";
     getColumns.mockResolvedValue([
-      { name: "id", data_type: "int", is_nullable: false, column_default: null, is_primary_key: true, extra: null },
-      { name: "status", data_type: "varchar", is_nullable: false, column_default: null, is_primary_key: false, extra: null },
-      { name: "extra", data_type: "json", is_nullable: true, column_default: null, is_primary_key: false, extra: null },
+      {
+        name: "id",
+        data_type: "int",
+        is_nullable: false,
+        column_default: null,
+        is_primary_key: true,
+        extra: null,
+      },
+      {
+        name: "status",
+        data_type: "varchar",
+        is_nullable: false,
+        column_default: null,
+        is_primary_key: false,
+        extra: null,
+      },
+      {
+        name: "extra",
+        data_type: "json",
+        is_nullable: true,
+        column_default: null,
+        is_primary_key: false,
+        extra: null,
+      },
     ]);
     analyzeEditableQueryEditability.mockResolvedValue({
       editable: true,
@@ -154,12 +198,27 @@ describe("queryStore hidden primary key editing", () => {
         columns: [
           { sourceName: "id", resultName: "id", expression: "id" },
           { sourceName: "status", resultName: "status", expression: "status" },
-          { sourceName: undefined, resultName: "mode", expression: "extra->>'$.mode'" },
-          { sourceName: undefined, resultName: "tmpl", expression: "extra->>'$.template'" },
+          {
+            sourceName: undefined,
+            resultName: "mode",
+            expression: "extra->>'$.mode'",
+          },
+          {
+            sourceName: undefined,
+            resultName: "tmpl",
+            expression: "extra->>'$.template'",
+          },
         ],
       },
     });
-    executeMulti.mockResolvedValue([{ columns: ["id", "status", "mode", "tmpl"], rows: [[1, "ok", "fast", "base"]], affected_rows: 0, execution_time_ms: 1 }]);
+    executeMulti.mockResolvedValue([
+      {
+        columns: ["id", "status", "mode", "tmpl"],
+        rows: [[1, "ok", "fast", "base"]],
+        affected_rows: 0,
+        execution_time_ms: 1,
+      },
+    ]);
 
     const { useQueryStore } = await import("@/stores/queryStore");
     const store = useQueryStore();
@@ -204,8 +263,22 @@ describe("queryStore hidden primary key editing", () => {
     expect(executeMulti).toHaveBeenCalledWith("mysql-1", "app", "SELECT sys_dept.* FROM sys_dept", undefined, expect.any(String), expect.objectContaining({ timeoutSecs: 30 }));
 
     columnsGate.resolve([
-      { name: "dept_id", data_type: "bigint", is_nullable: false, column_default: null, is_primary_key: true, extra: null },
-      { name: "dept_name", data_type: "varchar", is_nullable: true, column_default: null, is_primary_key: false, extra: null },
+      {
+        name: "dept_id",
+        data_type: "bigint",
+        is_nullable: false,
+        column_default: null,
+        is_primary_key: true,
+        extra: null,
+      },
+      {
+        name: "dept_name",
+        data_type: "varchar",
+        is_nullable: true,
+        column_default: null,
+        is_primary_key: false,
+        extra: null,
+      },
     ]);
     await execution;
     const tab = store.tabs.find((item) => item.id === tabId)!;
@@ -229,8 +302,22 @@ describe("queryStore hidden primary key editing", () => {
 
   it("keeps insert disabled when a MySQL table has a physical primary key named like DBX ROWID", async () => {
     getColumns.mockResolvedValue([
-      { name: "__DBX_ROWID", data_type: "varchar", is_nullable: false, column_default: null, is_primary_key: true, extra: null },
-      { name: "name", data_type: "varchar", is_nullable: true, column_default: null, is_primary_key: false, extra: null },
+      {
+        name: "__DBX_ROWID",
+        data_type: "varchar",
+        is_nullable: false,
+        column_default: null,
+        is_primary_key: true,
+        extra: null,
+      },
+      {
+        name: "name",
+        data_type: "varchar",
+        is_nullable: true,
+        column_default: null,
+        is_primary_key: false,
+        extra: null,
+      },
     ]);
     analyzeEditableQueryEditability.mockImplementation(async (sql: string) => ({
       editable: true,
@@ -238,7 +325,18 @@ describe("queryStore hidden primary key editing", () => {
         schema: undefined,
         tableName: "users",
         selectStar: false,
-        columns: [{ sourceName: "name", resultName: "name", expression: "name" }, ...(sql.includes("__DBX_PK_0") ? [{ sourceName: "__DBX_ROWID", resultName: "__DBX_PK_0", expression: "`__DBX_ROWID`" }] : [])],
+        columns: [
+          { sourceName: "name", resultName: "name", expression: "name" },
+          ...(sql.includes("__DBX_PK_0")
+            ? [
+                {
+                  sourceName: "__DBX_ROWID",
+                  resultName: "__DBX_PK_0",
+                  expression: "`__DBX_ROWID`",
+                },
+              ]
+            : []),
+        ],
       },
     }));
 
@@ -275,7 +373,14 @@ describe("queryStore hidden primary key editing", () => {
   });
 
   it("preserves JDBC catalog metadata lookup when the tab uses the connection default database", async () => {
-    getConnectionConfig.mockReturnValue({ id: "jdbc-1", name: "JDBC MySQL", db_type: "jdbc", connection_string: "jdbc:mysql://localhost:3306/app", database: "app", query_timeout_secs: 30 });
+    getConnectionConfig.mockReturnValue({
+      id: "jdbc-1",
+      name: "JDBC MySQL",
+      db_type: "jdbc",
+      connection_string: "jdbc:mysql://localhost:3306/app",
+      database: "app",
+      query_timeout_secs: 30,
+    });
     const { useQueryStore } = await import("@/stores/queryStore");
     const store = useQueryStore();
     const tabId = store.createTab("jdbc-1", "", "Query");
@@ -291,7 +396,14 @@ describe("queryStore hidden primary key editing", () => {
 
   it("starts a MySQL JDBC star query before slow column metadata finishes", async () => {
     const columnsGate = deferred<Awaited<ReturnType<typeof getColumns>>>();
-    getConnectionConfig.mockReturnValue({ id: "jdbc-1", name: "JDBC MySQL", db_type: "jdbc", connection_string: "jdbc:mysql://localhost:3306/app", database: "app", query_timeout_secs: 30 });
+    getConnectionConfig.mockReturnValue({
+      id: "jdbc-1",
+      name: "JDBC MySQL",
+      db_type: "jdbc",
+      connection_string: "jdbc:mysql://localhost:3306/app",
+      database: "app",
+      query_timeout_secs: 30,
+    });
     getColumns.mockReturnValue(columnsGate.promise);
     analyzeEditableQueryEditability.mockResolvedValue({
       editable: true,
@@ -320,8 +432,22 @@ describe("queryStore hidden primary key editing", () => {
     expect(executeMulti).toHaveBeenCalledWith("jdbc-1", "", "SELECT * FROM sys_dept", undefined, expect.any(String), expect.objectContaining({ timeoutSecs: 30 }));
 
     columnsGate.resolve([
-      { name: "dept_id", data_type: "bigint", is_nullable: false, column_default: null, is_primary_key: true, extra: null },
-      { name: "dept_name", data_type: "varchar", is_nullable: true, column_default: null, is_primary_key: false, extra: null },
+      {
+        name: "dept_id",
+        data_type: "bigint",
+        is_nullable: false,
+        column_default: null,
+        is_primary_key: true,
+        extra: null,
+      },
+      {
+        name: "dept_name",
+        data_type: "varchar",
+        is_nullable: true,
+        column_default: null,
+        is_primary_key: false,
+        extra: null,
+      },
     ]);
     await execution;
     const tab = store.tabs.find((item) => item.id === tabId)!;
@@ -348,7 +474,18 @@ describe("queryStore hidden primary key editing", () => {
           schema: "reporting",
           tableName: "users",
           selectStar: false,
-          columns: [{ sourceName: "name", resultName: "name", expression: "name" }, ...(hidden ? [{ sourceName: "id", resultName: "__DBX_PK_0", expression: "`id`" }] : [])],
+          columns: [
+            { sourceName: "name", resultName: "name", expression: "name" },
+            ...(hidden
+              ? [
+                  {
+                    sourceName: "id",
+                    resultName: "__DBX_PK_0",
+                    expression: "`id`",
+                  },
+                ]
+              : []),
+          ],
         },
       };
     });
@@ -367,14 +504,38 @@ describe("queryStore hidden primary key editing", () => {
   });
 
   it("uses a hidden Oracle ROWID to keep keyless base-table query results editable", async () => {
-    getConnectionConfig.mockReturnValue({ id: "oracle-1", name: "Oracle", db_type: "oracle", database: "ORCL", query_timeout_secs: 30 });
+    getConnectionConfig.mockReturnValue({
+      id: "oracle-1",
+      name: "Oracle",
+      db_type: "oracle",
+      database: "ORCL",
+      query_timeout_secs: 30,
+    });
     getColumns.mockResolvedValue([
-      { name: "ID", data_type: "NUMBER", is_nullable: false, column_default: null, is_primary_key: false, extra: null },
-      { name: "PLATFORM", data_type: "VARCHAR2(100)", is_nullable: true, column_default: null, is_primary_key: false, extra: null },
+      {
+        name: "ID",
+        data_type: "NUMBER",
+        is_nullable: false,
+        column_default: null,
+        is_primary_key: false,
+        extra: null,
+      },
+      {
+        name: "PLATFORM",
+        data_type: "VARCHAR2(100)",
+        is_nullable: true,
+        column_default: null,
+        is_primary_key: false,
+        extra: null,
+      },
     ]);
     lookupLocalCompletionTables.mockReturnValue([
       { name: "TT_PLATFORM_CARS", type: "view", schema: "REPORTING" },
-      { name: "TT_PLATFORM_CARS", type: "table", schema: "SH_SMCVDMS_OVERSEAS_DRSSITB" },
+      {
+        name: "TT_PLATFORM_CARS",
+        type: "table",
+        schema: "SH_SMCVDMS_OVERSEAS_DRSSITB",
+      },
     ]);
     analyzeEditableQueryEditability.mockImplementation(async (sql: string) => {
       const hidden = sql.includes("__DBX_PK_0");
@@ -387,7 +548,13 @@ describe("queryStore hidden primary key editing", () => {
           selectStar: !hidden,
           columns: hidden
             ? [
-                { star: true, sourceQualifier: "t", sourceKey: "t:0", resultName: "*", expression: "t.*" },
+                {
+                  star: true,
+                  sourceQualifier: "t",
+                  sourceKey: "t:0",
+                  resultName: "*",
+                  expression: "t.*",
+                },
                 { resultName: "__DBX_PK_0", expression: "ROWIDTOCHAR(ROWID)" },
               ]
             : [],
@@ -421,10 +588,31 @@ describe("queryStore hidden primary key editing", () => {
   });
 
   it("uses the configured current schema to keep an unqualified Oracle base-table query editable", async () => {
-    getConnectionConfig.mockReturnValue({ id: "oracle-1", name: "Oracle", db_type: "oracle", database: "ORCL", default_schema: "APP", query_timeout_secs: 30 });
+    getConnectionConfig.mockReturnValue({
+      id: "oracle-1",
+      name: "Oracle",
+      db_type: "oracle",
+      database: "ORCL",
+      default_schema: "APP",
+      query_timeout_secs: 30,
+    });
     getColumns.mockResolvedValue([
-      { name: "ID", data_type: "NUMBER", is_nullable: false, column_default: null, is_primary_key: false, extra: null },
-      { name: "NAME", data_type: "VARCHAR2(100)", is_nullable: true, column_default: null, is_primary_key: false, extra: null },
+      {
+        name: "ID",
+        data_type: "NUMBER",
+        is_nullable: false,
+        column_default: null,
+        is_primary_key: false,
+        extra: null,
+      },
+      {
+        name: "NAME",
+        data_type: "VARCHAR2(100)",
+        is_nullable: true,
+        column_default: null,
+        is_primary_key: false,
+        extra: null,
+      },
     ]);
     lookupLocalCompletionTables.mockReturnValue([
       { name: "CUSTOMERS", type: "view", schema: "REPORTING" },
@@ -440,7 +628,12 @@ describe("queryStore hidden primary key editing", () => {
           selectStar: !hidden,
           columns: hidden
             ? [
-                { star: true, sourceKey: "CUSTOMERS:0", resultName: "*", expression: "*" },
+                {
+                  star: true,
+                  sourceKey: "CUSTOMERS:0",
+                  resultName: "*",
+                  expression: "*",
+                },
                 { resultName: "__DBX_PK_0", expression: "ROWIDTOCHAR(ROWID)" },
               ]
             : [],
@@ -468,7 +661,13 @@ describe("queryStore hidden primary key editing", () => {
   });
 
   it("does not check Oracle ROWID eligibility when query metadata returns no columns", async () => {
-    getConnectionConfig.mockReturnValue({ id: "oracle-1", name: "Oracle", db_type: "oracle", database: "ORCL", query_timeout_secs: 30 });
+    getConnectionConfig.mockReturnValue({
+      id: "oracle-1",
+      name: "Oracle",
+      db_type: "oracle",
+      database: "ORCL",
+      query_timeout_secs: 30,
+    });
     getColumns.mockResolvedValue([]);
     analyzeEditableQueryEditability.mockResolvedValue({
       editable: true,
@@ -502,10 +701,30 @@ describe("queryStore hidden primary key editing", () => {
   });
 
   it("executes an Oracle cache-miss query without waiting for object discovery", async () => {
-    getConnectionConfig.mockReturnValue({ id: "oracle-1", name: "Oracle", db_type: "oracle", database: "ncdb", query_timeout_secs: 30 });
+    getConnectionConfig.mockReturnValue({
+      id: "oracle-1",
+      name: "Oracle",
+      db_type: "oracle",
+      database: "ncdb",
+      query_timeout_secs: 30,
+    });
     getColumns.mockResolvedValue([
-      { name: "ID", data_type: "NUMBER", is_nullable: false, column_default: null, is_primary_key: false, extra: null },
-      { name: "PRODUCT_NAME", data_type: "VARCHAR2(100)", is_nullable: true, column_default: null, is_primary_key: false, extra: null },
+      {
+        name: "ID",
+        data_type: "NUMBER",
+        is_nullable: false,
+        column_default: null,
+        is_primary_key: false,
+        extra: null,
+      },
+      {
+        name: "PRODUCT_NAME",
+        data_type: "VARCHAR2(100)",
+        is_nullable: true,
+        column_default: null,
+        is_primary_key: false,
+        extra: null,
+      },
     ]);
     listIndexes.mockResolvedValue([]);
     listObjects.mockReturnValue(new Promise(() => undefined));
@@ -541,9 +760,22 @@ describe("queryStore hidden primary key editing", () => {
 
   it("starts an Oracle primary-key star query before slow column metadata finishes", async () => {
     const columnsGate = deferred<Awaited<ReturnType<typeof getColumns>>>();
-    getConnectionConfig.mockReturnValue({ id: "oracle-1", name: "Oracle", db_type: "oracle", database: "ORCL", query_timeout_secs: 30 });
+    getConnectionConfig.mockReturnValue({
+      id: "oracle-1",
+      name: "Oracle",
+      db_type: "oracle",
+      database: "ORCL",
+      query_timeout_secs: 30,
+    });
     getColumns.mockReturnValue(columnsGate.promise);
-    listIndexes.mockResolvedValue([{ name: "PK_WIDE_TABLE", columns: ["ID"], is_unique: true, is_primary: true }]);
+    listIndexes.mockResolvedValue([
+      {
+        name: "PK_WIDE_TABLE",
+        columns: ["ID"],
+        is_unique: true,
+        is_primary: true,
+      },
+    ]);
     analyzeEditableQueryEditability.mockImplementation(async () => ({
       editable: true,
       analysis: {
@@ -572,17 +804,51 @@ describe("queryStore hidden primary key editing", () => {
     expect(executeMulti).toHaveBeenCalledWith("oracle-1", "ORCL", "SELECT t.* FROM APP.WIDE_TABLE t", undefined, expect.any(String), expect.objectContaining({ timeoutSecs: 30 }));
 
     columnsGate.resolve([
-      { name: "ID", data_type: "NUMBER", is_nullable: false, column_default: null, is_primary_key: true, extra: null },
-      { name: "NAME", data_type: "VARCHAR2(100)", is_nullable: true, column_default: null, is_primary_key: false, extra: null },
+      {
+        name: "ID",
+        data_type: "NUMBER",
+        is_nullable: false,
+        column_default: null,
+        is_primary_key: true,
+        extra: null,
+      },
+      {
+        name: "NAME",
+        data_type: "VARCHAR2(100)",
+        is_nullable: true,
+        column_default: null,
+        is_primary_key: false,
+        extra: null,
+      },
     ]);
     await execution;
   });
 
   it("keeps a keyless Oracle query editable when its WHERE clause reads another table", async () => {
-    getConnectionConfig.mockReturnValue({ id: "oracle-1", name: "Oracle", db_type: "oracle", database: "ORCL", query_timeout_secs: 30 });
+    getConnectionConfig.mockReturnValue({
+      id: "oracle-1",
+      name: "Oracle",
+      db_type: "oracle",
+      database: "ORCL",
+      query_timeout_secs: 30,
+    });
     getColumns.mockResolvedValue([
-      { name: "ID", data_type: "NUMBER", is_nullable: false, column_default: null, is_primary_key: false, extra: null },
-      { name: "CUSTOMER_NO", data_type: "NUMBER", is_nullable: true, column_default: null, is_primary_key: false, extra: null },
+      {
+        name: "ID",
+        data_type: "NUMBER",
+        is_nullable: false,
+        column_default: null,
+        is_primary_key: false,
+        extra: null,
+      },
+      {
+        name: "CUSTOMER_NO",
+        data_type: "NUMBER",
+        is_nullable: true,
+        column_default: null,
+        is_primary_key: false,
+        extra: null,
+      },
     ]);
     lookupLocalCompletionTables.mockReturnValue([{ name: "PLATFORM_CARS", type: "table", schema: "APP" }]);
     analyzeEditableQueryEditability.mockImplementation(async (sql: string) => {
@@ -596,7 +862,13 @@ describe("queryStore hidden primary key editing", () => {
           selectStar: !hidden,
           columns: hidden
             ? [
-                { star: true, sourceQualifier: "t", sourceKey: "t:0", resultName: "*", expression: "t.*" },
+                {
+                  star: true,
+                  sourceQualifier: "t",
+                  sourceKey: "t:0",
+                  resultName: "*",
+                  expression: "t.*",
+                },
                 { resultName: "__DBX_PK_0", expression: "ROWIDTOCHAR(ROWID)" },
               ]
             : [],
@@ -635,11 +907,183 @@ describe("queryStore hidden primary key editing", () => {
     expect(tab.queryEditabilityReason).toBeUndefined();
   });
 
-  it("does not inject Oracle ROWID into keyless view queries", async () => {
-    getConnectionConfig.mockReturnValue({ id: "oracle-1", name: "Oracle", db_type: "oracle", database: "ORCL", query_timeout_secs: 30 });
+  it("injects Oracle ROWID when lookupLocalCompletionTables cache is empty (optimistic fallback)", async () => {
+    getConnectionConfig.mockReturnValue({
+      id: "oracle-1",
+      name: "Oracle",
+      db_type: "oracle",
+      database: "ORCL",
+      default_schema: "APP",
+      query_timeout_secs: 30,
+    });
     getColumns.mockResolvedValue([
-      { name: "ID", data_type: "NUMBER", is_nullable: false, column_default: null, is_primary_key: false, extra: null },
-      { name: "PLATFORM", data_type: "VARCHAR2(100)", is_nullable: true, column_default: null, is_primary_key: false, extra: null },
+      {
+        name: "OFFER_RELA_ID",
+        data_type: "NUMBER",
+        is_nullable: false,
+        column_default: null,
+        is_primary_key: false,
+        extra: null,
+      },
+      {
+        name: "ORI_OFFER_ID",
+        data_type: "NUMBER",
+        is_nullable: true,
+        column_default: null,
+        is_primary_key: false,
+        extra: null,
+      },
+      {
+        name: "DEST_OFFER_ID",
+        data_type: "NUMBER",
+        is_nullable: true,
+        column_default: null,
+        is_primary_key: false,
+        extra: null,
+      },
+    ]);
+    // 对象浏览器缓存为空——模拟用户未浏览过该 schema 的场景
+    lookupLocalCompletionTables.mockReturnValue([]);
+    analyzeEditableQueryEditability.mockImplementation(async (sql: string) => {
+      const hidden = sql.includes("__DBX_PK_0");
+      return {
+        editable: true,
+        analysis: {
+          schema: "APP",
+          tableName: "OFFER_RELA",
+          tableAlias: "t",
+          selectStar: !hidden,
+          columns: hidden
+            ? [
+                {
+                  star: true,
+                  sourceQualifier: "t",
+                  sourceKey: "t:0",
+                  resultName: "*",
+                  expression: "t.*",
+                },
+                { resultName: "__DBX_PK_0", expression: "ROWIDTOCHAR(ROWID)" },
+              ]
+            : [],
+        },
+      };
+    });
+    executeMulti.mockResolvedValue([
+      {
+        columns: ["OFFER_RELA_ID", "ORI_OFFER_ID", "DEST_OFFER_ID", "__DBX_PK_0"],
+        rows: [[121433, 114808, 127923, "AAAPr9AAEAAAACXAAA"]],
+        affected_rows: 0,
+        execution_time_ms: 1,
+      },
+    ]);
+
+    const { useQueryStore } = await import("@/stores/queryStore");
+    const store = useQueryStore();
+    const tabId = store.createTab("oracle-1", "ORCL", "Query");
+
+    await store.executeTabSql(tabId, "SELECT t.* FROM APP.OFFER_RELA t WHERE t.ORI_OFFER_ID = 114808 AND t.DEST_OFFER_ID = 127923");
+
+    // 即使缓存为空，也应该注入 ROWID（乐观放行）
+    expect(executeMulti).toHaveBeenCalledWith("oracle-1", "ORCL", 'SELECT t.*, ROWIDTOCHAR(ROWID) AS "__DBX_PK_0" FROM APP.OFFER_RELA t WHERE t.ORI_OFFER_ID = 114808 AND t.DEST_OFFER_ID = 127923', undefined, expect.any(String), expect.objectContaining({ timeoutSecs: 30 }));
+    const tab = store.tabs.find((item) => item.id === tabId)!;
+    expect(tab.result?.hidden_column_indexes).toEqual([3]);
+    await vi.waitFor(() => expect(tab.querySourceColumns).toEqual(["OFFER_RELA_ID", "ORI_OFFER_ID", "DEST_OFFER_ID", "__DBX_ROWID"]));
+    expect(tab.queryEditabilityReason).toBeUndefined();
+  });
+
+  it("recognises user-provided Oracle ROWID when hidden key injection did not fire", async () => {
+    getConnectionConfig.mockReturnValue({
+      id: "oracle-1",
+      name: "Oracle",
+      db_type: "oracle",
+      database: "ORCL",
+      default_schema: "APP",
+      query_timeout_secs: 30,
+    });
+    getColumns.mockResolvedValue([
+      {
+        name: "OFFER_RELA_ID",
+        data_type: "NUMBER",
+        is_nullable: false,
+        column_default: null,
+        is_primary_key: false,
+        extra: null,
+      },
+      {
+        name: "ORI_OFFER_ID",
+        data_type: "NUMBER",
+        is_nullable: true,
+        column_default: null,
+        is_primary_key: false,
+        extra: null,
+      },
+      {
+        name: "DEST_OFFER_ID",
+        data_type: "NUMBER",
+        is_nullable: true,
+        column_default: null,
+        is_primary_key: false,
+        extra: null,
+      },
+    ]);
+    lookupLocalCompletionTables.mockReturnValue([]);
+    // 模拟注入未生效（SQL 解析器无法改写），但用户已手动写出 ROWID
+    analyzeEditableQueryEditability.mockResolvedValue({
+      editable: true,
+      analysis: {
+        schema: "APP",
+        tableName: "OFFER_RELA",
+        tableAlias: "t",
+        selectStar: true,
+        columns: [],
+      },
+    });
+    executeMulti.mockResolvedValue([
+      {
+        columns: ["OFFER_RELA_ID", "ORI_OFFER_ID", "DEST_OFFER_ID", "ROWID"],
+        rows: [[121433, 114808, 127923, "AAAPr9AAEAAAACXAAA"]],
+        affected_rows: 0,
+        execution_time_ms: 1,
+      },
+    ]);
+
+    const { useQueryStore } = await import("@/stores/queryStore");
+    const store = useQueryStore();
+    const tabId = store.createTab("oracle-1", "ORCL", "Query");
+
+    await store.executeTabSql(tabId, "SELECT t.*, t.ROWID FROM APP.OFFER_RELA t WHERE t.ORI_OFFER_ID = 114808");
+
+    const tab = store.tabs.find((item) => item.id === tabId)!;
+    // 用户手动写出 ROWID 时，编辑功能应可用
+    await vi.waitFor(() => expect(tab.queryEditabilityReason).toBeUndefined());
+    expect(tab.tableMeta?.primaryKeys).toEqual(["__DBX_ROWID"]);
+  });
+
+  it("does not inject Oracle ROWID into keyless view queries", async () => {
+    getConnectionConfig.mockReturnValue({
+      id: "oracle-1",
+      name: "Oracle",
+      db_type: "oracle",
+      database: "ORCL",
+      query_timeout_secs: 30,
+    });
+    getColumns.mockResolvedValue([
+      {
+        name: "ID",
+        data_type: "NUMBER",
+        is_nullable: false,
+        column_default: null,
+        is_primary_key: false,
+        extra: null,
+      },
+      {
+        name: "PLATFORM",
+        data_type: "VARCHAR2(100)",
+        is_nullable: true,
+        column_default: null,
+        is_primary_key: false,
+        extra: null,
+      },
     ]);
     listIndexes.mockResolvedValue([]);
     lookupLocalCompletionTables.mockReturnValue([{ name: "PLATFORM_VIEW", type: "view", schema: "APP" }]);
@@ -673,10 +1117,30 @@ describe("queryStore hidden primary key editing", () => {
   });
 
   it("enables deferred Oracle LOBs only when a base-table query has a stable key", async () => {
-    getConnectionConfig.mockReturnValue({ id: "oracle-1", name: "Oracle", db_type: "oracle", database: "ORCL", query_timeout_secs: 30 });
+    getConnectionConfig.mockReturnValue({
+      id: "oracle-1",
+      name: "Oracle",
+      db_type: "oracle",
+      database: "ORCL",
+      query_timeout_secs: 30,
+    });
     getColumns.mockResolvedValue([
-      { name: "ID", data_type: "NUMBER", is_nullable: false, column_default: null, is_primary_key: true, extra: null },
-      { name: "PAYLOAD", data_type: "CLOB", is_nullable: true, column_default: null, is_primary_key: false, extra: null },
+      {
+        name: "ID",
+        data_type: "NUMBER",
+        is_nullable: false,
+        column_default: null,
+        is_primary_key: true,
+        extra: null,
+      },
+      {
+        name: "PAYLOAD",
+        data_type: "CLOB",
+        is_nullable: true,
+        column_default: null,
+        is_primary_key: false,
+        extra: null,
+      },
     ]);
     lookupLocalCompletionTables.mockReturnValue([{ name: "DOCUMENTS", type: "table", schema: "APP" }]);
     analyzeEditableQueryEditability.mockImplementation(async (sql: string) => ({
@@ -685,10 +1149,32 @@ describe("queryStore hidden primary key editing", () => {
         schema: "APP",
         tableName: "DOCUMENTS",
         selectStar: false,
-        columns: [{ sourceName: "PAYLOAD", resultName: "PAYLOAD", expression: "PAYLOAD" }, ...(sql.includes("__DBX_PK_0") ? [{ sourceName: "ID", resultName: "__DBX_PK_0", expression: '"ID"' }] : [])],
+        columns: [
+          {
+            sourceName: "PAYLOAD",
+            resultName: "PAYLOAD",
+            expression: "PAYLOAD",
+          },
+          ...(sql.includes("__DBX_PK_0")
+            ? [
+                {
+                  sourceName: "ID",
+                  resultName: "__DBX_PK_0",
+                  expression: '"ID"',
+                },
+              ]
+            : []),
+        ],
       },
     }));
-    executeMulti.mockResolvedValue([{ columns: ["PAYLOAD", "__DBX_PK_0"], rows: [["<CLOB>", 1]], affected_rows: 0, execution_time_ms: 1 }]);
+    executeMulti.mockResolvedValue([
+      {
+        columns: ["PAYLOAD", "__DBX_PK_0"],
+        rows: [["<CLOB>", 1]],
+        affected_rows: 0,
+        execution_time_ms: 1,
+      },
+    ]);
 
     const { useQueryStore } = await import("@/stores/queryStore");
     const store = useQueryStore();
@@ -700,10 +1186,30 @@ describe("queryStore hidden primary key editing", () => {
   });
 
   it("keeps deferred Oracle LOBs disabled for views", async () => {
-    getConnectionConfig.mockReturnValue({ id: "oracle-1", name: "Oracle", db_type: "oracle", database: "ORCL", query_timeout_secs: 30 });
+    getConnectionConfig.mockReturnValue({
+      id: "oracle-1",
+      name: "Oracle",
+      db_type: "oracle",
+      database: "ORCL",
+      query_timeout_secs: 30,
+    });
     getColumns.mockResolvedValue([
-      { name: "ID", data_type: "NUMBER", is_nullable: false, column_default: null, is_primary_key: false, extra: null },
-      { name: "PAYLOAD", data_type: "CLOB", is_nullable: true, column_default: null, is_primary_key: false, extra: null },
+      {
+        name: "ID",
+        data_type: "NUMBER",
+        is_nullable: false,
+        column_default: null,
+        is_primary_key: false,
+        extra: null,
+      },
+      {
+        name: "PAYLOAD",
+        data_type: "CLOB",
+        is_nullable: true,
+        column_default: null,
+        is_primary_key: false,
+        extra: null,
+      },
     ]);
     listIndexes.mockResolvedValue([]);
     lookupLocalCompletionTables.mockReturnValue([{ name: "DOCUMENT_VIEW", type: "view", schema: "APP" }]);
@@ -716,7 +1222,14 @@ describe("queryStore hidden primary key editing", () => {
         columns: [],
       },
     });
-    executeMulti.mockResolvedValue([{ columns: ["ID", "PAYLOAD"], rows: [[1, "value"]], affected_rows: 0, execution_time_ms: 1 }]);
+    executeMulti.mockResolvedValue([
+      {
+        columns: ["ID", "PAYLOAD"],
+        rows: [[1, "value"]],
+        affected_rows: 0,
+        execution_time_ms: 1,
+      },
+    ]);
 
     const { useQueryStore } = await import("@/stores/queryStore");
     const store = useQueryStore();
@@ -729,10 +1242,30 @@ describe("queryStore hidden primary key editing", () => {
   });
 
   it("keeps deferred Oracle LOBs disabled when a keyless source has no safe ROWID path", async () => {
-    getConnectionConfig.mockReturnValue({ id: "oracle-1", name: "Oracle", db_type: "oracle", database: "ORCL", query_timeout_secs: 30 });
+    getConnectionConfig.mockReturnValue({
+      id: "oracle-1",
+      name: "Oracle",
+      db_type: "oracle",
+      database: "ORCL",
+      query_timeout_secs: 30,
+    });
     getColumns.mockResolvedValue([
-      { name: "ID", data_type: "NUMBER", is_nullable: false, column_default: null, is_primary_key: false, extra: null },
-      { name: "PAYLOAD", data_type: "CLOB", is_nullable: true, column_default: null, is_primary_key: false, extra: null },
+      {
+        name: "ID",
+        data_type: "NUMBER",
+        is_nullable: false,
+        column_default: null,
+        is_primary_key: false,
+        extra: null,
+      },
+      {
+        name: "PAYLOAD",
+        data_type: "CLOB",
+        is_nullable: true,
+        column_default: null,
+        is_primary_key: false,
+        extra: null,
+      },
     ]);
     listIndexes.mockResolvedValue([]);
     lookupLocalCompletionTables.mockReturnValue([]);
@@ -745,7 +1278,14 @@ describe("queryStore hidden primary key editing", () => {
         columns: [],
       },
     });
-    executeMulti.mockResolvedValue([{ columns: ["ID", "PAYLOAD"], rows: [[1, "value"]], affected_rows: 0, execution_time_ms: 1 }]);
+    executeMulti.mockResolvedValue([
+      {
+        columns: ["ID", "PAYLOAD"],
+        rows: [[1, "value"]],
+        affected_rows: 0,
+        execution_time_ms: 1,
+      },
+    ]);
 
     const { useQueryStore } = await import("@/stores/queryStore");
     const store = useQueryStore();
@@ -758,10 +1298,30 @@ describe("queryStore hidden primary key editing", () => {
   });
 
   it("does not request deferred Oracle LOB handling for ordinary non-LOB queries", async () => {
-    getConnectionConfig.mockReturnValue({ id: "oracle-1", name: "Oracle", db_type: "oracle", database: "ORCL", query_timeout_secs: 30 });
+    getConnectionConfig.mockReturnValue({
+      id: "oracle-1",
+      name: "Oracle",
+      db_type: "oracle",
+      database: "ORCL",
+      query_timeout_secs: 30,
+    });
     getColumns.mockResolvedValue([
-      { name: "ID", data_type: "NUMBER", is_nullable: false, column_default: null, is_primary_key: true, extra: null },
-      { name: "NAME", data_type: "VARCHAR2(100)", is_nullable: true, column_default: null, is_primary_key: false, extra: null },
+      {
+        name: "ID",
+        data_type: "NUMBER",
+        is_nullable: false,
+        column_default: null,
+        is_primary_key: true,
+        extra: null,
+      },
+      {
+        name: "NAME",
+        data_type: "VARCHAR2(100)",
+        is_nullable: true,
+        column_default: null,
+        is_primary_key: false,
+        extra: null,
+      },
     ]);
     lookupLocalCompletionTables.mockReturnValue([{ name: "CUSTOMERS", type: "table", schema: "APP" }]);
     analyzeEditableQueryEditability.mockImplementation(async (sql: string) => ({
@@ -770,10 +1330,28 @@ describe("queryStore hidden primary key editing", () => {
         schema: "APP",
         tableName: "CUSTOMERS",
         selectStar: false,
-        columns: [{ sourceName: "NAME", resultName: "NAME", expression: "NAME" }, ...(sql.includes("__DBX_PK_0") ? [{ sourceName: "ID", resultName: "__DBX_PK_0", expression: '"ID"' }] : [])],
+        columns: [
+          { sourceName: "NAME", resultName: "NAME", expression: "NAME" },
+          ...(sql.includes("__DBX_PK_0")
+            ? [
+                {
+                  sourceName: "ID",
+                  resultName: "__DBX_PK_0",
+                  expression: '"ID"',
+                },
+              ]
+            : []),
+        ],
       },
     }));
-    executeMulti.mockResolvedValue([{ columns: ["NAME", "__DBX_PK_0"], rows: [["Alice", 1]], affected_rows: 0, execution_time_ms: 1 }]);
+    executeMulti.mockResolvedValue([
+      {
+        columns: ["NAME", "__DBX_PK_0"],
+        rows: [["Alice", 1]],
+        affected_rows: 0,
+        execution_time_ms: 1,
+      },
+    ]);
 
     const { useQueryStore } = await import("@/stores/queryStore");
     const store = useQueryStore();
@@ -795,10 +1373,30 @@ describe("queryStore hidden primary key editing", () => {
       ],
     ],
   ])("does not infer the current schema when %s", async (_caseName, cachedTables) => {
-    getConnectionConfig.mockReturnValue({ id: "oracle-1", name: "Oracle", db_type: "oracle", database: "ORCL", query_timeout_secs: 30 });
+    getConnectionConfig.mockReturnValue({
+      id: "oracle-1",
+      name: "Oracle",
+      db_type: "oracle",
+      database: "ORCL",
+      query_timeout_secs: 30,
+    });
     getColumns.mockResolvedValue([
-      { name: "ID", data_type: "NUMBER", is_nullable: false, column_default: null, is_primary_key: false, extra: null },
-      { name: "NAME", data_type: "VARCHAR2(100)", is_nullable: true, column_default: null, is_primary_key: false, extra: null },
+      {
+        name: "ID",
+        data_type: "NUMBER",
+        is_nullable: false,
+        column_default: null,
+        is_primary_key: false,
+        extra: null,
+      },
+      {
+        name: "NAME",
+        data_type: "VARCHAR2(100)",
+        is_nullable: true,
+        column_default: null,
+        is_primary_key: false,
+        extra: null,
+      },
     ]);
     lookupLocalCompletionTables.mockReturnValue(cachedTables);
     analyzeEditableQueryEditability.mockResolvedValue({
@@ -810,7 +1408,14 @@ describe("queryStore hidden primary key editing", () => {
         columns: [],
       },
     });
-    executeMulti.mockResolvedValue([{ columns: ["ID", "NAME"], rows: [[1, "Alice"]], affected_rows: 0, execution_time_ms: 1 }]);
+    executeMulti.mockResolvedValue([
+      {
+        columns: ["ID", "NAME"],
+        rows: [[1, "Alice"]],
+        affected_rows: 0,
+        execution_time_ms: 1,
+      },
+    ]);
 
     const { useQueryStore } = await import("@/stores/queryStore");
     const store = useQueryStore();
@@ -928,10 +1533,30 @@ describe("queryStore hidden primary key editing", () => {
   });
 
   it("loads unqualified Oracle metadata from the login schema instead of the service name", async () => {
-    getConnectionConfig.mockReturnValue({ id: "oracle-1", name: "Oracle", db_type: "oracle", database: "XEPDB1", query_timeout_secs: 30 });
+    getConnectionConfig.mockReturnValue({
+      id: "oracle-1",
+      name: "Oracle",
+      db_type: "oracle",
+      database: "XEPDB1",
+      query_timeout_secs: 30,
+    });
     getColumns.mockResolvedValue([
-      { name: "ID", data_type: "NUMBER", is_nullable: false, column_default: null, is_primary_key: true, extra: null },
-      { name: "NAME", data_type: "VARCHAR2", is_nullable: true, column_default: null, is_primary_key: false, extra: null },
+      {
+        name: "ID",
+        data_type: "NUMBER",
+        is_nullable: false,
+        column_default: null,
+        is_primary_key: true,
+        extra: null,
+      },
+      {
+        name: "NAME",
+        data_type: "VARCHAR2",
+        is_nullable: true,
+        column_default: null,
+        is_primary_key: false,
+        extra: null,
+      },
     ]);
     analyzeEditableQueryEditability.mockImplementation(async (sql: string) => {
       const hidden = sql.includes("__DBX_PK_0");
@@ -941,7 +1566,18 @@ describe("queryStore hidden primary key editing", () => {
           schema: undefined,
           tableName: "DBX_HIDDEN_PK_EDIT_TEST",
           selectStar: false,
-          columns: [{ sourceName: "NAME", resultName: "NAME", expression: "NAME" }, ...(hidden ? [{ sourceName: "ID", resultName: "__DBX_PK_0", expression: '"ID"' }] : [])],
+          columns: [
+            { sourceName: "NAME", resultName: "NAME", expression: "NAME" },
+            ...(hidden
+              ? [
+                  {
+                    sourceName: "ID",
+                    resultName: "__DBX_PK_0",
+                    expression: '"ID"',
+                  },
+                ]
+              : []),
+          ],
         },
       };
     });
@@ -971,10 +1607,30 @@ describe("queryStore hidden primary key editing", () => {
   });
 
   it("keeps SQL Server updates unqualified when the SELECT source is unqualified", async () => {
-    getConnectionConfig.mockReturnValue({ id: "sqlserver-1", name: "SQL Server 2008", db_type: "sqlserver", database: "cdc", query_timeout_secs: 30 });
+    getConnectionConfig.mockReturnValue({
+      id: "sqlserver-1",
+      name: "SQL Server 2008",
+      db_type: "sqlserver",
+      database: "cdc",
+      query_timeout_secs: 30,
+    });
     getColumns.mockResolvedValue([
-      { name: "id", data_type: "int", is_nullable: false, column_default: null, is_primary_key: true, extra: null },
-      { name: "a4", data_type: "nvarchar(100)", is_nullable: true, column_default: null, is_primary_key: false, extra: null },
+      {
+        name: "id",
+        data_type: "int",
+        is_nullable: false,
+        column_default: null,
+        is_primary_key: true,
+        extra: null,
+      },
+      {
+        name: "a4",
+        data_type: "nvarchar(100)",
+        is_nullable: true,
+        column_default: null,
+        is_primary_key: false,
+        extra: null,
+      },
     ]);
     analyzeEditableQueryEditability.mockResolvedValue({
       editable: true,
@@ -982,7 +1638,14 @@ describe("queryStore hidden primary key editing", () => {
         schema: undefined,
         tableName: "yb_ty_qtxx",
         selectStar: true,
-        columns: [{ sourceName: undefined, star: true, resultName: "*", expression: "*" }],
+        columns: [
+          {
+            sourceName: undefined,
+            star: true,
+            resultName: "*",
+            expression: "*",
+          },
+        ],
       },
     });
     executeMulti.mockResolvedValue([
@@ -1008,14 +1671,27 @@ describe("queryStore hidden primary key editing", () => {
   });
 
   it("preserves an explicitly qualified SQL Server update source", async () => {
-    getConnectionConfig.mockReturnValue({ id: "sqlserver-1", name: "SQL Server 2008", db_type: "sqlserver", database: "cdc", query_timeout_secs: 30 });
+    getConnectionConfig.mockReturnValue({
+      id: "sqlserver-1",
+      name: "SQL Server 2008",
+      db_type: "sqlserver",
+      database: "cdc",
+      query_timeout_secs: 30,
+    });
     analyzeEditableQueryEditability.mockResolvedValue({
       editable: true,
       analysis: {
         schema: "sales",
         tableName: "yb_ty_qtxx",
         selectStar: true,
-        columns: [{ sourceName: undefined, star: true, resultName: "*", expression: "*" }],
+        columns: [
+          {
+            sourceName: undefined,
+            star: true,
+            resultName: "*",
+            expression: "*",
+          },
+        ],
       },
     });
     executeMulti.mockResolvedValue([
@@ -1042,9 +1718,30 @@ describe("queryStore hidden primary key editing", () => {
 
   it("appends only the missing part of a composite primary key", async () => {
     getColumns.mockResolvedValue([
-      { name: "tenant_id", data_type: "int", is_nullable: false, column_default: null, is_primary_key: true, extra: null },
-      { name: "item_id", data_type: "int", is_nullable: false, column_default: null, is_primary_key: true, extra: null },
-      { name: "name", data_type: "varchar", is_nullable: true, column_default: null, is_primary_key: false, extra: null },
+      {
+        name: "tenant_id",
+        data_type: "int",
+        is_nullable: false,
+        column_default: null,
+        is_primary_key: true,
+        extra: null,
+      },
+      {
+        name: "item_id",
+        data_type: "int",
+        is_nullable: false,
+        column_default: null,
+        is_primary_key: true,
+        extra: null,
+      },
+      {
+        name: "name",
+        data_type: "varchar",
+        is_nullable: true,
+        column_default: null,
+        is_primary_key: false,
+        extra: null,
+      },
     ]);
     analyzeEditableQueryEditability.mockImplementation(async (sql: string) => {
       const hidden = sql.includes("__DBX_PK_0");
@@ -1054,7 +1751,23 @@ describe("queryStore hidden primary key editing", () => {
           schema: undefined,
           tableName: "items",
           selectStar: false,
-          columns: [{ sourceName: "tenant_id", resultName: "tenant_id", expression: "tenant_id" }, { sourceName: "name", resultName: "name", expression: "name" }, ...(hidden ? [{ sourceName: "item_id", resultName: "__DBX_PK_0", expression: "`item_id`" }] : [])],
+          columns: [
+            {
+              sourceName: "tenant_id",
+              resultName: "tenant_id",
+              expression: "tenant_id",
+            },
+            { sourceName: "name", resultName: "name", expression: "name" },
+            ...(hidden
+              ? [
+                  {
+                    sourceName: "item_id",
+                    resultName: "__DBX_PK_0",
+                    expression: "`item_id`",
+                  },
+                ]
+              : []),
+          ],
         },
       };
     });
@@ -1104,10 +1817,31 @@ describe("queryStore hidden primary key editing", () => {
 
   it("does not hide a unique index when the table has no declared primary key", async () => {
     getColumns.mockResolvedValue([
-      { name: "email", data_type: "varchar", is_nullable: false, column_default: null, is_primary_key: false, extra: null },
-      { name: "name", data_type: "varchar", is_nullable: true, column_default: null, is_primary_key: false, extra: null },
+      {
+        name: "email",
+        data_type: "varchar",
+        is_nullable: false,
+        column_default: null,
+        is_primary_key: false,
+        extra: null,
+      },
+      {
+        name: "name",
+        data_type: "varchar",
+        is_nullable: true,
+        column_default: null,
+        is_primary_key: false,
+        extra: null,
+      },
     ]);
-    listIndexes.mockResolvedValue([{ name: "uq_users_email", columns: ["email"], is_unique: true, is_primary: false }]);
+    listIndexes.mockResolvedValue([
+      {
+        name: "uq_users_email",
+        columns: ["email"],
+        is_unique: true,
+        is_primary: false,
+      },
+    ]);
     executeMulti.mockResolvedValue([
       {
         columns: ["name"],
@@ -1131,9 +1865,30 @@ describe("queryStore hidden primary key editing", () => {
 
   it("hides returned internal keys but remains read-only when another hidden key is missing", async () => {
     getColumns.mockResolvedValue([
-      { name: "tenant_id", data_type: "int", is_nullable: false, column_default: null, is_primary_key: true, extra: null },
-      { name: "item_id", data_type: "int", is_nullable: false, column_default: null, is_primary_key: true, extra: null },
-      { name: "name", data_type: "varchar", is_nullable: true, column_default: null, is_primary_key: false, extra: null },
+      {
+        name: "tenant_id",
+        data_type: "int",
+        is_nullable: false,
+        column_default: null,
+        is_primary_key: true,
+        extra: null,
+      },
+      {
+        name: "item_id",
+        data_type: "int",
+        is_nullable: false,
+        column_default: null,
+        is_primary_key: true,
+        extra: null,
+      },
+      {
+        name: "name",
+        data_type: "varchar",
+        is_nullable: true,
+        column_default: null,
+        is_primary_key: false,
+        extra: null,
+      },
     ]);
     analyzeEditableQueryEditability.mockImplementation(async (sql: string) => {
       const hidden = sql.includes("__DBX_PK_0");
@@ -1147,8 +1902,16 @@ describe("queryStore hidden primary key editing", () => {
             { sourceName: "name", resultName: "name", expression: "name" },
             ...(hidden
               ? [
-                  { sourceName: "tenant_id", resultName: "__DBX_PK_0", expression: "`tenant_id`" },
-                  { sourceName: "item_id", resultName: "__DBX_PK_1", expression: "`item_id`" },
+                  {
+                    sourceName: "tenant_id",
+                    resultName: "__DBX_PK_0",
+                    expression: "`tenant_id`",
+                  },
+                  {
+                    sourceName: "item_id",
+                    resultName: "__DBX_PK_1",
+                    expression: "`item_id`",
+                  },
                 ]
               : []),
           ],
@@ -1260,8 +2023,22 @@ describe("queryStore hidden primary key editing", () => {
       schema: "public",
       tableName: "users",
       columns: [
-        { name: "id", data_type: "int", is_nullable: false, is_primary_key: true, column_default: null, extra: null },
-        { name: "name", data_type: "varchar", is_nullable: true, is_primary_key: false, column_default: null, extra: null },
+        {
+          name: "id",
+          data_type: "int",
+          is_nullable: false,
+          is_primary_key: true,
+          column_default: null,
+          extra: null,
+        },
+        {
+          name: "name",
+          data_type: "varchar",
+          is_nullable: true,
+          is_primary_key: false,
+          column_default: null,
+          extra: null,
+        },
       ],
       primaryKeys: ["id"],
     });
@@ -1313,8 +2090,22 @@ describe("queryStore hidden primary key editing", () => {
       schema: "public",
       tableName: "users",
       columns: [
-        { name: "id", data_type: "int", is_nullable: false, is_primary_key: true, column_default: null, extra: null },
-        { name: "name", data_type: "varchar", is_nullable: true, is_primary_key: false, column_default: null, extra: null },
+        {
+          name: "id",
+          data_type: "int",
+          is_nullable: false,
+          is_primary_key: true,
+          column_default: null,
+          extra: null,
+        },
+        {
+          name: "name",
+          data_type: "varchar",
+          is_nullable: true,
+          is_primary_key: false,
+          column_default: null,
+          extra: null,
+        },
       ],
       primaryKeys: ["id"],
     });
@@ -1338,8 +2129,17 @@ describe("queryStore hidden primary key editing", () => {
   });
 
   it("stops appending when a SQL Server query has no bounded next-page plan", async () => {
-    getConnectionConfig.mockReturnValue({ id: "sqlserver-1", name: "SQL Server", db_type: "sqlserver", database: "app", query_timeout_secs: 30 });
-    analyzeEditableQueryEditability.mockResolvedValue({ editable: false, reason: "complex-query" });
+    getConnectionConfig.mockReturnValue({
+      id: "sqlserver-1",
+      name: "SQL Server",
+      db_type: "sqlserver",
+      database: "app",
+      query_timeout_secs: 30,
+    });
+    analyzeEditableQueryEditability.mockResolvedValue({
+      editable: false,
+      reason: "complex-query",
+    });
     const rows = Array.from({ length: 28 }, (_, index) => [index + 1]);
     executeMulti.mockResolvedValueOnce([
       {
