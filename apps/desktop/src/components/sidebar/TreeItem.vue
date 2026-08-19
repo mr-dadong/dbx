@@ -647,26 +647,29 @@ function toggleConnectionMultiSelection(event: MouseEvent) {
   rowRef.value?.focus({ preventScroll: true });
 }
 
-// 分组勾选框级联选中分组（含子分组）下的所有连接，勾选框按已选中比例显示三种状态。
-function connectionGroupSelectionState(): "none" | "partial" | "all" {
-  if (activeNode.value.type !== "connection-group") return "none";
+function connectionIdsForActiveGroupSelection(): string[] {
+  if (activeNode.value.type !== "connection-group") return [];
   const groupConnectionIds = connectionIdsUnderGroup(connectionStore.sidebarLayout, activeNode.value.id);
-  // 空分组没有可级联的连接，勾选框保持未选状态
+  const projectedConnectionIds = sidebarTreeContext?.getProjectedConnectionIds?.();
+  return projectedConnectionIds ? groupConnectionIds.filter((id) => projectedConnectionIds.has(id)) : groupConnectionIds;
+}
+
+const connectionGroupSelectionState = computed<"none" | "partial" | "all">(() => {
+  const groupConnectionIds = connectionIdsForActiveGroupSelection();
   if (groupConnectionIds.length === 0) return "none";
   const selectedIds = connectionStore.selectedTreeNodeIdsSet;
   const selectedCount = groupConnectionIds.filter((id) => selectedIds.has(id)).length;
   if (selectedCount === 0) return "none";
   if (selectedCount === groupConnectionIds.length) return "all";
   return "partial";
-}
+});
 
 function toggleConnectionGroupMultiSelection(event: MouseEvent) {
   event.preventDefault();
   event.stopPropagation();
   if (activeNode.value.type !== "connection-group") return;
 
-  const groupConnectionIds = connectionIdsUnderGroup(connectionStore.sidebarLayout, activeNode.value.id);
-  // 空分组没有可级联的连接，点击不产生任何选择变化
+  const groupConnectionIds = connectionIdsForActiveGroupSelection();
   if (groupConnectionIds.length === 0) return;
 
   // 当前是分组多选（Ctrl/Shift 框选分组行）时，改为级联选中连接并重新开始
@@ -1468,14 +1471,17 @@ function onKeydown(event: KeyboardEvent) {
         <button
           v-if="node.type === 'connection-group'"
           type="button"
+          role="checkbox"
           data-sidebar-group-selection-toggle="true"
           class="ml-auto flex h-4 w-4 shrink-0 items-center justify-center rounded text-muted-foreground/55 opacity-0 transition-colors transition-opacity hover:bg-secondary/45 hover:text-foreground focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring group-hover/sidebar-row:opacity-100"
-          :class="{ 'opacity-100': isConnectionMultiSelectActive() || isConnectionGroupMultiSelectActive() || connectionGroupSelectionState() !== 'none' }"
+          :class="{ 'opacity-100': isConnectionMultiSelectActive() || isConnectionGroupMultiSelectActive() || connectionGroupSelectionState !== 'none' }"
+          :aria-label="connectionGroupSelectionState === 'all' ? t('connectionGroup.deselectGroup') : t('connectionGroup.selectGroup')"
+          :aria-checked="connectionGroupSelectionState === 'partial' ? 'mixed' : connectionGroupSelectionState === 'all'"
           @mousedown.stop
           @click="toggleConnectionGroupMultiSelection"
         >
-          <Check v-if="connectionGroupSelectionState() === 'all'" class="h-3 w-3 text-primary" />
-          <Minus v-else-if="connectionGroupSelectionState() === 'partial'" class="h-3 w-3 text-primary" />
+          <Check v-if="connectionGroupSelectionState === 'all'" class="h-3 w-3 text-primary" />
+          <Minus v-else-if="connectionGroupSelectionState === 'partial'" class="h-3 w-3 text-primary" />
           <Square v-else class="h-3 w-3 stroke-[1.7]" />
         </button>
       </div>
