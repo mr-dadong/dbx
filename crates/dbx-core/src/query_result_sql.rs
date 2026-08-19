@@ -1485,6 +1485,7 @@ fn has_top_level_offset_fetch_next(sql: &str) -> bool {
 /// 1. 把 `#`/`##` 临时表前缀当成注释跳过到行尾，丢掉同一行后面的 OFFSET/FETCH；
 /// 2. 要求 OFFSET 与 FETCH NEXT 同时出现，漏掉只写 `OFFSET n ROWS` 的合法语句；
 /// 3. 把字符串里的反斜杠当转义符，引号配对错乱后丢失后续词法。
+///
 /// AST 解析不受这些影响，因此作为补充检测，避免向已有分页的语句注入 TOP。
 fn sql_server_ast_has_offset_or_fetch(statement: &str) -> bool {
     // 解析失败时返回 false，交由原有词法检测结果决定，不改变既有行为。
