@@ -15,7 +15,8 @@ export type BuildRoutineRenameObjectSourceInput = BuildEditableObjectSourceSqlIn
 
 export type ObjectSourceSaveExecutionMode = "single" | "script";
 
-const postgresLikeRoutineRenameTypes = new Set<DatabaseType>(["postgres", "redshift", "gaussdb", "kwdb", "kingbase", "highgo", "uxdb", "vastbase"]);
+// openGauss 的函数/存储过程重命名走 PG 系源码重建路径（后端 is_postgres_like 已包含 OpenGauss）
+const postgresLikeRoutineRenameTypes = new Set<DatabaseType>(["postgres", "redshift", "gaussdb", "kwdb", "opengauss", "kingbase", "highgo", "uxdb", "vastbase"]);
 const postgresLikeViewTypes = new Set<DatabaseType>(["postgres", "redshift", "gaussdb", "kwdb", "opengauss", "questdb", "kingbase", "highgo", "uxdb", "vastbase"]);
 const mysqlLikeRoutineRenameTypes = new Set<DatabaseType>(["mysql", "goldendb"]);
 const oracleLikeRoutineRenameTypes = new Set<DatabaseType>(["oracle", "dameng"]);
