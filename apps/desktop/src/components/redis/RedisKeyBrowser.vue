@@ -2038,73 +2038,72 @@ defineExpose({ focusSearch, insertCommand, executeCommand: executeAiCommand });
     <Splitpanes class="redis-workspace-splitpanes h-full">
       <!-- Key tree (left) -->
       <Pane :size="36" :min-size="24">
-        <div ref="keyPaneRef" class="redis-key-pane relative h-full flex flex-col overflow-hidden outline-none"
-          tabindex="0" @keydown="onKeyPaneKeydown">
+        <div ref="keyPaneRef" class="redis-key-pane relative h-full flex flex-col overflow-hidden outline-none" tabindex="0" @keydown="onKeyPaneKeydown">
           <!-- Toolbar -->
           <div class="border-b px-2 py-2 shrink-0">
             <div class="redis-key-toolbar-header">
               <div class="redis-search-mode-group flex rounded-md border bg-muted/30 p-0.5" role="group">
-                <button type="button" class="redis-search-mode-button h-5 px-2 text-xs rounded-sm transition-colors"
-                  :class="searchMode === 'key' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'"
-                  @click="setSearchMode('key')">
+                <button type="button" class="redis-search-mode-button h-5 px-2 text-xs rounded-sm transition-colors" :class="searchMode === 'key' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'" @click="setSearchMode('key')">
                   {{ t("redis.searchByKey") }}
                 </button>
-                <button type="button" class="redis-search-mode-button h-5 px-2 text-xs rounded-sm transition-colors"
-                  :class="searchMode === 'value' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'"
-                  @click="setSearchMode('value')">
+                <button type="button" class="redis-search-mode-button h-5 px-2 text-xs rounded-sm transition-colors" :class="searchMode === 'value' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'" @click="setSearchMode('value')">
                   {{ t("redis.searchByValue") }}
                 </button>
-                <button type="button" class="redis-search-mode-button h-5 px-2 text-xs rounded-sm transition-colors"
-                  :class="searchMode === 'all' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'"
-                  @click="setSearchMode('all')">
+                <button type="button" class="redis-search-mode-button h-5 px-2 text-xs rounded-sm transition-colors" :class="searchMode === 'all' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'" @click="setSearchMode('all')">
                   {{ t("redis.searchByAll") }}
                 </button>
               </div>
-              <span class="redis-key-count truncate text-xs text-muted-foreground" :title="keyCountText">{{ keyCountText
-                }}</span>
+              <span class="redis-key-count truncate text-xs text-muted-foreground" :title="keyCountText">{{ keyCountText }}</span>
               <div class="redis-key-toolbar-actions flex items-center justify-end gap-1">
-                <Button v-if="(flatKeys.length > 0 || hasMore) && !allKeysSelected" variant="ghost" size="sm"
-                  class="h-6 shrink-0 px-1.5 text-xs" :disabled="selectionBusy" :title="t('redis.selectAllLoadedTitle')"
-                  data-redis-select-all @click="selectAllKeys">{{ t("redis.selectAllLoaded") }}</Button>
-                <Button v-if="checkedKeys.size > 0" variant="ghost" size="sm" class="h-6 shrink-0 px-1.5 text-xs"
-                  :disabled="selectionBusy" data-redis-deselect-all @click="clearAllCheckedKeys">{{
-                    t("redis.deselectAll") }}</Button>
-                <Button v-if="checkedKeys.size > 0" variant="ghost" size="sm"
-                  class="h-6 shrink-0 text-xs text-destructive" :disabled="selectionBusy" data-redis-batch-delete
-                  @click="requestBatchDelete">
-                  <Trash2 class="w-3 h-3 mr-1" />{{ checkedKeys.size }}
-                </Button>
+                <Button v-if="(flatKeys.length > 0 || hasMore) && !allKeysSelected" variant="ghost" size="sm" class="h-6 shrink-0 px-1.5 text-xs" :disabled="selectionBusy" :title="t('redis.selectAllLoadedTitle')" data-redis-select-all @click="selectAllKeys">{{ t("redis.selectAllLoaded") }}</Button>
+                <Button v-if="checkedKeys.size > 0" variant="ghost" size="sm" class="h-6 shrink-0 px-1.5 text-xs" :disabled="selectionBusy" data-redis-deselect-all @click="clearAllCheckedKeys">{{ t("redis.deselectAll") }}</Button>
+                <Button v-if="checkedKeys.size > 0" variant="ghost" size="sm" class="h-6 shrink-0 text-xs text-destructive" :disabled="selectionBusy" data-redis-batch-delete @click="requestBatchDelete"> <Trash2 class="w-3 h-3 mr-1" />{{ checkedKeys.size }} </Button>
                 <Button variant="ghost" size="icon" class="h-6 w-6 shrink-0" :disabled="deletingKeys" @click="loadKeys">
                   <Loader2 v-if="loading" class="h-3 w-3 animate-spin" />
                   <RefreshCw v-else class="h-3 w-3" />
                 </Button>
-                <Button variant="ghost" size="icon" class="h-6 w-6 shrink-0" :title="t('redis.createKey')"
-                  @click="openCreateKeyDialog">
+                <Button variant="ghost" size="icon" class="h-6 w-6 shrink-0" :title="t('redis.createKey')" @click="openCreateKeyDialog">
                   <Plus class="h-3 w-3" />
                 </Button>
               </div>
             </div>
             <div class="redis-key-search-row mt-2">
               <div class="relative min-w-0">
-                <Search
-                  class="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground/80" />
-                <Input v-model="searchPattern" data-redis-search-input
+                <Search class="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground/80" />
+                <Input
+                  v-model="searchPattern"
+                  data-redis-search-input
                   class="h-8 border-border/70 bg-background pl-8 pr-3 text-xs shadow-sm caret-primary placeholder:text-muted-foreground/80 focus-visible:border-primary/60 focus-visible:ring-2 focus-visible:ring-primary/20"
-                  :placeholder="searchPlaceholder" @input="onSearchInput" @keydown="onSearchKeydown" />
+                  :placeholder="searchPlaceholder"
+                  @input="onSearchInput"
+                  @keydown="onSearchKeydown"
+                />
               </div>
               <div class="flex shrink-0 items-center gap-1">
-                <Button v-if="searchMode === 'key'" variant="ghost" size="sm"
+                <Button
+                  v-if="searchMode === 'key'"
+                  variant="ghost"
+                  size="sm"
                   class="h-8 max-w-full shrink-0 whitespace-nowrap px-2 text-xs"
                   :class="fuzzyKeySearch ? 'bg-accent text-accent-foreground' : 'border border-dashed border-border/70 text-muted-foreground hover:text-foreground'"
-                  :title="t('redis.fuzzyMatchTitle')" :aria-pressed="fuzzyKeySearch" @click="toggleFuzzyKeySearch">
+                  :title="t('redis.fuzzyMatchTitle')"
+                  :aria-pressed="fuzzyKeySearch"
+                  @click="toggleFuzzyKeySearch"
+                >
                   <Asterisk class="redis-fuzzy-icon h-3 w-3 mr-1" />
                   <span class="redis-fuzzy-label">{{ t("redis.fuzzyMatch") }}</span>
                 </Button>
                 <!-- 仅看无过期：在已加载结果里过滤出 TTL 为 -1 的 key，方便批量定位未设置过期时间的缓存 -->
-                <Button variant="ghost" size="sm" class="h-8 shrink-0 whitespace-nowrap px-2 text-xs"
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  class="h-8 shrink-0 whitespace-nowrap px-2 text-xs"
                   :class="noExpiryOnly ? 'bg-accent text-accent-foreground' : 'border border-dashed border-border/70 text-muted-foreground hover:text-foreground'"
-                  :title="t('redis.noExpiryOnlyTitle')" :aria-pressed="noExpiryOnly" data-redis-no-expiry-filter
-                  @click="noExpiryOnly = !noExpiryOnly">
+                  :title="t('redis.noExpiryOnlyTitle')"
+                  :aria-pressed="noExpiryOnly"
+                  data-redis-no-expiry-filter
+                  @click="noExpiryOnly = !noExpiryOnly"
+                >
                   <Clock class="h-3 w-3 mr-1" />
                   <span>{{ t("redis.noExpiryOnly") }}</span>
                 </Button>
@@ -2112,12 +2111,10 @@ defineExpose({ focusSearch, insertCommand, executeCommand: executeAiCommand });
             </div>
           </div>
 
-          <div v-if="flatKeys.length === 0 && !loading"
-            class="flex-1 flex flex-col items-center justify-center text-muted-foreground text-xs p-4 text-center">
+          <div v-if="flatKeys.length === 0 && !loading" class="flex-1 flex flex-col items-center justify-center text-muted-foreground text-xs p-4 text-center">
             <template v-if="hasMore">
               <span class="mb-3">{{ t("redis.noKeysInScanHint") }}</span>
-              <Button variant="outline" size="sm" class="h-7 text-xs"
-                :disabled="loadingMore || searchPending || deletingKeys" @click="loadMore()">
+              <Button variant="outline" size="sm" class="h-7 text-xs" :disabled="loadingMore || searchPending || deletingKeys" @click="loadMore()">
                 <Loader2 v-if="loadingMore" class="w-3 h-3 mr-1.5 animate-spin" />
                 {{ t("redis.loadMoreKeys") }}
               </Button>
@@ -2126,70 +2123,73 @@ defineExpose({ focusSearch, insertCommand, executeCommand: executeAiCommand });
               {{ t("redis.noKeys") }}
             </template>
           </div>
-          <div v-else-if="loading && flatKeys.length === 0"
-            class="flex-1 flex items-center justify-center gap-2 text-muted-foreground text-xs">
+          <div v-else-if="loading && flatKeys.length === 0" class="flex-1 flex items-center justify-center gap-2 text-muted-foreground text-xs">
             <Loader2 class="w-3.5 h-3.5 animate-spin" />
             <span>{{ loadingEmptyText }}</span>
           </div>
           <!-- 过滤开启但没有命中任何无过期 key 时，给出明确空态提示而不是空白列表 -->
-          <div v-else-if="noExpiryOnly && visibleRows.length === 0"
-            class="flex-1 flex items-center justify-center text-muted-foreground text-xs p-4 text-center">
+          <div v-else-if="noExpiryOnly && visibleRows.length === 0" class="flex-1 flex items-center justify-center text-muted-foreground text-xs p-4 text-center">
             {{ t("redis.noExpiryKeysEmpty") }}
           </div>
-          <RecycleScroller v-else ref="redisKeyScrollerRef" class="redis-key-scroller flex-1" :items="visibleRows"
-            :item-size="30" :buffer="600" :skip-hover="true" key-field="id" @scroll="onRedisKeyScroll"
-            @resize="maybeAutoLoadMoreRedisKeys">
+          <RecycleScroller v-else ref="redisKeyScrollerRef" class="redis-key-scroller flex-1" :items="visibleRows" :item-size="30" :buffer="600" :skip-hover="true" key-field="id" @scroll="onRedisKeyScroll" @resize="maybeAutoLoadMoreRedisKeys">
             <template #default="{ item: row }">
               <CustomContextMenu :items="redisKeyContextMenuItems(row.node)" v-slot="{ onContextMenu, isOpen }">
-                <div class="flex items-center gap-2 border-b px-3 text-[13px] cursor-pointer group" :class="[
-                  isOpen || (row.node.kind === 'leaf' && selectedKeyRaw === row.node.keyRaw) ? 'bg-accent text-accent-foreground' : 'hover:bg-accent/40',
-                  row.node.kind === 'leaf' ? (isLeafChecked(row.node.keyRaw) && selectedKeyRaw !== row.node.keyRaw ? 'bg-primary/10' : undefined) : groupSelectedCount(row.node) > 0 ? 'bg-primary/10' : undefined,
-                ]" :style="{ height: '30px' }" @click="onRowClick(row.node, $event)"
-                  @contextmenu="(event) => onRedisRowContextMenu(event, row.node, onContextMenu)">
-                  <div class="min-w-0 flex flex-1 items-center gap-1 overflow-hidden"
-                    :style="{ paddingLeft: `${12 + row.depth * 16}px` }">
+                <div
+                  class="flex items-center gap-2 border-b px-3 text-[13px] cursor-pointer group"
+                  :class="[
+                    isOpen || (row.node.kind === 'leaf' && selectedKeyRaw === row.node.keyRaw) ? 'bg-accent text-accent-foreground' : 'hover:bg-accent/40',
+                    row.node.kind === 'leaf' ? (isLeafChecked(row.node.keyRaw) && selectedKeyRaw !== row.node.keyRaw ? 'bg-primary/10' : undefined) : groupSelectedCount(row.node) > 0 ? 'bg-primary/10' : undefined,
+                  ]"
+                  :style="{ height: '30px' }"
+                  @click="onRowClick(row.node, $event)"
+                  @contextmenu="(event) => onRedisRowContextMenu(event, row.node, onContextMenu)"
+                >
+                  <div class="min-w-0 flex flex-1 items-center gap-1 overflow-hidden" :style="{ paddingLeft: `${12 + row.depth * 16}px` }">
                     <template v-if="row.node.kind === 'group'">
-                      <input type="checkbox" class="h-3.5 w-3.5 shrink-0 accent-primary cursor-pointer"
-                        :checked="isNodeChecked(row.node)" :indeterminate="isGroupPartiallyChecked(row.node)"
+                      <input
+                        type="checkbox"
+                        class="h-3.5 w-3.5 shrink-0 accent-primary cursor-pointer"
+                        :checked="isNodeChecked(row.node)"
+                        :indeterminate="isGroupPartiallyChecked(row.node)"
                         :aria-label="t('redis.selectLoadedGroupKeys', { count: row.node.loadedLeafCount })"
-                        :disabled="selectionBusy" :data-redis-group="row.node.id"
-                        @click="toggleNodeCheck(row.node, $event)" />
-                      <component :is="expandedGroupIds.has(row.node.id) ? ChevronDown : ChevronRight"
-                        class="w-3 h-3 shrink-0 text-muted-foreground" />
-                      <component :is="expandedGroupIds.has(row.node.id) ? FolderOpen : FolderClosed"
-                        class="h-3.5 w-3.5 shrink-0 text-amber-500" />
+                        :disabled="selectionBusy"
+                        :data-redis-group="row.node.id"
+                        @click="toggleNodeCheck(row.node, $event)"
+                      />
+                      <component :is="expandedGroupIds.has(row.node.id) ? ChevronDown : ChevronRight" class="w-3 h-3 shrink-0 text-muted-foreground" />
+                      <component :is="expandedGroupIds.has(row.node.id) ? FolderOpen : FolderClosed" class="h-3.5 w-3.5 shrink-0 text-amber-500" />
                       <span class="dbx-editor-font-family truncate">{{ row.node.label }}</span>
-                      <span class="text-muted-foreground ml-1"
-                        :title="isFuzzyHierarchyView ? t('redis.loadedMatchingKeys', { count: row.node.loadedLeafCount }) : hasMore ? t('redis.loadedGroupKeysPartial', { count: row.node.loadedLeafCount }) : undefined">({{
-                          row.node.loadedLeafCount }}{{ !isFuzzyHierarchyView && hasMore ? "+" : "" }})</span>
+                      <span class="text-muted-foreground ml-1" :title="isFuzzyHierarchyView ? t('redis.loadedMatchingKeys', { count: row.node.loadedLeafCount }) : hasMore ? t('redis.loadedGroupKeysPartial', { count: row.node.loadedLeafCount }) : undefined"
+                        >({{ row.node.loadedLeafCount }}{{ !isFuzzyHierarchyView && hasMore ? "+" : "" }})</span
+                      >
                     </template>
                     <template v-else>
                       <span class="relative flex h-4 w-4 shrink-0 items-center justify-center">
-                        <KeyRound class="h-3.5 w-3.5 text-muted-foreground/70 transition-opacity group-hover:opacity-0"
-                          :class="{ 'opacity-0': isLeafChecked(row.node.keyRaw) }" />
-                        <input type="checkbox"
+                        <KeyRound class="h-3.5 w-3.5 text-muted-foreground/70 transition-opacity group-hover:opacity-0" :class="{ 'opacity-0': isLeafChecked(row.node.keyRaw) }" />
+                        <input
+                          type="checkbox"
                           class="absolute h-3.5 w-3.5 accent-primary cursor-pointer opacity-0 group-hover:opacity-100"
-                          :class="{ 'opacity-100': isLeafChecked(row.node.keyRaw) }" :disabled="selectionBusy"
-                          :checked="isLeafChecked(row.node.keyRaw)" :data-redis-leaf="row.node.keyRaw"
-                          @click="toggleNodeCheck(row.node, $event)" />
+                          :class="{ 'opacity-100': isLeafChecked(row.node.keyRaw) }"
+                          :disabled="selectionBusy"
+                          :checked="isLeafChecked(row.node.keyRaw)"
+                          :data-redis-leaf="row.node.keyRaw"
+                          @click="toggleNodeCheck(row.node, $event)"
+                        />
                       </span>
                       <span class="dbx-editor-font-family truncate">{{ row.node.label }}</span>
                     </template>
                   </div>
                   <div class="flex shrink-0 items-center justify-end gap-1">
-                    <Badge v-if="row.node.kind === 'leaf' && row.node.keyType" variant="outline"
-                      class="text-xs px-1.5 py-0" :class="typeColor(row.node.keyType)">{{ row.node.keyType }}</Badge>
+                    <Badge v-if="row.node.kind === 'leaf' && row.node.keyType" variant="outline" class="text-xs px-1.5 py-0" :class="typeColor(row.node.keyType)">{{ row.node.keyType }}</Badge>
                     <!-- TTL 徽标：与类型徽标保持一致的胶囊样式，永不过期为琥珀色、临近过期/已过期为红色警示 -->
                     <span
                       v-if="row.node.kind === 'leaf' && redisTtlBadgeText(row.node.ttl, redisRowDisplayTtl(row.node.ttl, row.node.keyRaw))"
                       class="inline-flex shrink-0 items-center whitespace-nowrap rounded border px-1.5 py-0.5 text-[11px] leading-none"
                       :class="redisTtlBadgeClass(row.node.ttl, redisRowDisplayTtl(row.node.ttl, row.node.keyRaw))"
-                      :title="row.node.ttl === -1 ? t('redis.noExpiry') : t('redis.ttlCountdownTitle')">{{
-                        redisTtlBadgeText(row.node.ttl, redisRowDisplayTtl(row.node.ttl, row.node.keyRaw)) }}</span>
-                    <Button v-if="row.node.kind === 'group' && !isFuzzyHierarchyView" variant="ghost" size="icon"
-                      class="h-5 w-5 shrink-0 text-destructive opacity-0 group-hover:opacity-100"
-                      :title="t('redis.deleteGroup')" :disabled="selectionBusy"
-                      @click="requestGroupDelete(row.node, $event)">
+                      :title="row.node.ttl === -1 ? t('redis.noExpiry') : t('redis.ttlCountdownTitle')"
+                      >{{ redisTtlBadgeText(row.node.ttl, redisRowDisplayTtl(row.node.ttl, row.node.keyRaw)) }}</span
+                    >
+                    <Button v-if="row.node.kind === 'group' && !isFuzzyHierarchyView" variant="ghost" size="icon" class="h-5 w-5 shrink-0 text-destructive opacity-0 group-hover:opacity-100" :title="t('redis.deleteGroup')" :disabled="selectionBusy" @click="requestGroupDelete(row.node, $event)">
                       <Trash2 class="h-3 w-3" />
                     </Button>
                   </div>
@@ -2197,18 +2197,15 @@ defineExpose({ focusSearch, insertCommand, executeCommand: executeAiCommand });
               </CustomContextMenu>
             </template>
           </RecycleScroller>
-          <div v-if="fuzzyTreeLimitReached"
-            class="shrink-0 border-t px-3 py-2 text-center text-xs text-muted-foreground">
+          <div v-if="fuzzyTreeLimitReached" class="shrink-0 border-t px-3 py-2 text-center text-xs text-muted-foreground">
             {{ t("redis.fuzzyTreeLimit", { count: flatKeys.length }) }}
           </div>
           <div v-if="hasMore && !isFetchingAll" class="shrink-0 border-t px-2 py-1.5 flex items-center gap-1.5">
-            <Button variant="outline" size="sm" class="h-7 text-xs flex-1"
-              :disabled="loadingMore || loading || searchPending || deletingKeys" @click="loadMore()">
+            <Button variant="outline" size="sm" class="h-7 text-xs flex-1" :disabled="loadingMore || loading || searchPending || deletingKeys" @click="loadMore()">
               <Loader2 v-if="loadingMore" class="w-3 h-3 mr-1.5 animate-spin" />
               {{ t("redis.loadMoreKeys") }}
             </Button>
-            <Button variant="outline" size="sm" class="h-7 text-xs flex-1"
-              :disabled="loading || searchPending || deletingKeys || !hasMore" @click="fetchAll">
+            <Button variant="outline" size="sm" class="h-7 text-xs flex-1" :disabled="loading || searchPending || deletingKeys || !hasMore" @click="fetchAll">
               {{ t("redis.fetchAllKeys") }}
             </Button>
           </div>
@@ -2216,8 +2213,7 @@ defineExpose({ focusSearch, insertCommand, executeCommand: executeAiCommand });
             <div class="text-xs text-muted-foreground text-center">
               {{ fetchAllProgressText }}
             </div>
-            <Button variant="destructive" size="sm" class="h-7 text-xs w-full"
-              :disabled="fetchAllStopRequested || deletingKeys" @click="stopFetchAll">
+            <Button variant="destructive" size="sm" class="h-7 text-xs w-full" :disabled="fetchAllStopRequested || deletingKeys" @click="stopFetchAll">
               {{ t("redis.stopFetchAll") }}
             </Button>
           </div>
@@ -2234,8 +2230,7 @@ defineExpose({ focusSearch, insertCommand, executeCommand: executeAiCommand });
                   <KeyRound class="size-3.5" />
                   {{ t("redis.keyDetail") }}
                 </TabsTrigger>
-                <TabsTrigger value="command" class="h-6 flex-none gap-1.5 rounded-md px-2 text-xs"
-                  @click="openCommandPanel">
+                <TabsTrigger value="command" class="h-6 flex-none gap-1.5 rounded-md px-2 text-xs" @click="openCommandPanel">
                   <TerminalSquare class="size-3.5" />
                   {{ t("redis.commandLine") }}
                 </TabsTrigger>
@@ -2248,28 +2243,33 @@ defineExpose({ focusSearch, insertCommand, executeCommand: executeAiCommand });
                   {{ t("redis.slowlog") }}
                 </TabsTrigger>
               </TabsList>
-              <Button v-if="activeSidePanel === 'command'" variant="ghost" size="icon" class="h-6 w-6"
-                :title="t('redis.clearHistory')" @click="clearInMemoryHistory">
+              <Button v-if="activeSidePanel === 'command'" variant="ghost" size="icon" class="h-6 w-6" :title="t('redis.clearHistory')" @click="clearInMemoryHistory">
                 <History class="size-3.5" />
               </Button>
             </div>
 
             <TabsContent value="detail" class="m-0 min-h-0 flex-1 flex flex-col">
-              <RedisValueViewer v-if="selectedKey" ref="valueViewerRef" :key="selectedKey.key_raw"
-                :connection-id="connectionId" :db="db" :key-display="selectedKey.key_display"
-                :key-raw="selectedKey.key_raw" :metadata="selectedKey" @deleted="onKeyDeleted" @renamed="onKeyRenamed"
-                @loaded="onKeyLoaded" />
+              <RedisValueViewer
+                v-if="selectedKey"
+                ref="valueViewerRef"
+                :key="selectedKey.key_raw"
+                :connection-id="connectionId"
+                :db="db"
+                :key-display="selectedKey.key_display"
+                :key-raw="selectedKey.key_raw"
+                :metadata="selectedKey"
+                @deleted="onKeyDeleted"
+                @renamed="onKeyRenamed"
+                @loaded="onKeyLoaded"
+              />
               <div v-else class="flex-1 flex items-center justify-center text-xs text-muted-foreground">
                 {{ t("redis.selectKeyForDetail") }}
               </div>
             </TabsContent>
 
             <TabsContent value="command" class="m-0 min-h-0 flex-1 flex flex-col">
-              <div
-                class="dbx-editor-font-family relative flex min-h-0 flex-1 flex-col bg-[#171b21] text-[13px] leading-5 text-slate-200"
-                @click="onCommandAreaClick">
-                <div ref="commandTerminalRef"
-                  class="redis-command-terminal min-h-0 flex-1 overflow-auto px-4 pb-3 pt-4">
+              <div class="dbx-editor-font-family relative flex min-h-0 flex-1 flex-col bg-[#171b21] text-[13px] leading-5 text-slate-200" @click="onCommandAreaClick">
+                <div ref="commandTerminalRef" class="redis-command-terminal min-h-0 flex-1 overflow-auto px-4 pb-3 pt-4">
                   <div class="mb-4 text-slate-400">
                     <span class="text-slate-200">{{ t("redis.commandWelcome") }}</span>
                   </div>
@@ -2279,48 +2279,58 @@ defineExpose({ focusSearch, insertCommand, executeCommand: executeAiCommand });
                       <span class="shrink-0 text-[#d7ba7d]">{{ entry.prompt }}</span>
                       <span class="min-w-0 text-slate-200">{{ entry.command }}</span>
                     </div>
-                    <pre v-if="entry.output" class="ml-0 whitespace-pre-wrap break-words pl-0"
-                      :class="entry.error ? 'text-[#ff6b6b]' : 'text-slate-300'">{{ entry.output }}</pre>
+                    <pre v-if="entry.output" class="ml-0 whitespace-pre-wrap break-words pl-0" :class="entry.error ? 'text-[#ff6b6b]' : 'text-slate-300'">{{ entry.output }}</pre>
                   </div>
                 </div>
 
-                <form class="flex shrink-0 items-center gap-2 border-t border-white/10 bg-[#171b21] px-4 py-2"
-                  @submit.prevent="executeCommand">
+                <form class="flex shrink-0 items-center gap-2 border-t border-white/10 bg-[#171b21] px-4 py-2" @submit.prevent="executeCommand">
                   <span class="shrink-0 text-[#d7ba7d]">{{ commandPrompt }}</span>
                   <div class="relative min-w-0 flex-1">
-                    <div v-if="commandCompletionOpen"
-                      class="absolute bottom-[calc(100%+0.5rem)] left-0 z-20 w-full overflow-hidden rounded-md border border-white/15 bg-[#20262f] py-1 shadow-xl">
-                      <div v-if="commandDocumentationLoading || commandCompletionLoading"
-                        class="flex items-center justify-center px-3 py-2 text-slate-400">
+                    <div v-if="commandCompletionOpen" class="absolute bottom-[calc(100%+0.5rem)] left-0 z-20 w-full overflow-hidden rounded-md border border-white/15 bg-[#20262f] py-1 shadow-xl">
+                      <div v-if="commandDocumentationLoading || commandCompletionLoading" class="flex items-center justify-center px-3 py-2 text-slate-400">
                         <Loader2 class="h-3.5 w-3.5 animate-spin" />
                       </div>
-                      <div v-else :id="commandCompletionListboxId" role="listbox" aria-label="Redis command completions"
-                        class="max-h-60 overflow-y-auto">
-                        <button v-for="(item, index) in commandCompletionItems"
+                      <div v-else :id="commandCompletionListboxId" role="listbox" aria-label="Redis command completions" class="max-h-60 overflow-y-auto">
+                        <button
+                          v-for="(item, index) in commandCompletionItems"
                           :id="`${commandCompletionListboxId}-option-${index}`"
-                          :key="`${item.type}:${item.label}:${index}`" type="button" role="option"
+                          :key="`${item.type}:${item.label}:${index}`"
+                          type="button"
+                          role="option"
                           class="flex w-full items-center gap-3 px-3 py-1.5 text-left text-xs transition-colors"
                           :class="commandCompletionSelectedIndex === index ? 'bg-[#2b3440] text-white' : 'text-slate-200 hover:text-white'"
-                          :aria-selected="commandCompletionSelectedIndex === index" :aria-description="item.info"
-                          @pointerenter="selectCommandCompletion(index)" @mousedown.prevent
-                          @click.stop="acceptCommandCompletion(index)">
+                          :aria-selected="commandCompletionSelectedIndex === index"
+                          :aria-description="item.info"
+                          @pointerenter="selectCommandCompletion(index)"
+                          @mousedown.prevent
+                          @click.stop="acceptCommandCompletion(index)"
+                        >
                           <span class="min-w-0 flex-1">
                             <span class="block truncate font-mono">{{ item.label }}</span>
-                            <span v-if="item.summary" class="block truncate text-[11px] text-slate-400">{{ item.summary
-                              }}</span>
+                            <span v-if="item.summary" class="block truncate text-[11px] text-slate-400">{{ item.summary }}</span>
                           </span>
                           <span v-if="item.detail" class="shrink-0 text-slate-400">{{ item.detail }}</span>
                         </button>
                       </div>
                     </div>
-                    <input v-model="commandText" data-redis-command-input
+                    <input
+                      v-model="commandText"
+                      data-redis-command-input
                       class="dbx-editor-font-family min-w-0 w-full border-0 bg-transparent p-0 text-[13px] text-slate-200 caret-[#d7ba7d] outline-none placeholder:text-slate-500"
-                      :class="{ 'opacity-50': commandRunning }" :readonly="commandRunning" autocomplete="off"
-                      autocapitalize="off" spellcheck="false" aria-autocomplete="list" aria-haspopup="listbox"
+                      :class="{ 'opacity-50': commandRunning }"
+                      :readonly="commandRunning"
+                      autocomplete="off"
+                      autocapitalize="off"
+                      spellcheck="false"
+                      aria-autocomplete="list"
+                      aria-haspopup="listbox"
                       :aria-controls="commandCompletionOpen ? commandCompletionListboxId : undefined"
                       :aria-activedescendant="commandCompletionOpen ? commandCompletionActiveDescendant : undefined"
-                      :aria-expanded="commandCompletionOpen" @click.stop="onCommandInputClick" @input="onCommandInput"
-                      @keydown="onCommandInputKeydown" />
+                      :aria-expanded="commandCompletionOpen"
+                      @click.stop="onCommandInputClick"
+                      @input="onCommandInput"
+                      @keydown="onCommandInputKeydown"
+                    />
                   </div>
                   <Loader2 v-if="commandRunning" class="h-3.5 w-3.5 shrink-0 animate-spin text-slate-500" />
                 </form>
@@ -2339,9 +2349,7 @@ defineExpose({ focusSearch, insertCommand, executeCommand: executeAiCommand });
       </Pane>
     </Splitpanes>
 
-    <DangerConfirmDialog v-model:open="showDangerConfirm" :message="dangerMessage" :details="dangerDetails"
-      :confirm-label="dangerConfirmLabel" :loading="deletingKeys"
-      :close-on-confirm="pendingDanger?.kind !== 'delete-keys'" @confirm="applyDangerAction" />
+    <DangerConfirmDialog v-model:open="showDangerConfirm" :message="dangerMessage" :details="dangerDetails" :confirm-label="dangerConfirmLabel" :loading="deletingKeys" :close-on-confirm="pendingDanger?.kind !== 'delete-keys'" @confirm="applyDangerAction" />
 
     <Dialog :open="showCreateKeyDialog" @update:open="onCreateKeyDialogOpenChange">
       <DialogContent class="sm:max-w-md" :show-close-button="!creatingKey" :style="editorFontFamilyStyle">
@@ -2352,32 +2360,23 @@ defineExpose({ focusSearch, insertCommand, executeCommand: executeAiCommand });
         <div class="grid gap-3">
           <label class="grid gap-1.5 text-xs font-medium">
             <span>{{ t("redis.createKeyName") }}</span>
-            <Input v-model="createKeyName" class="dbx-editor-font-family h-8 text-xs"
-              :disabled="creatingKey || createKeyPartiallyWritten" :placeholder="t('redis.createKeyNamePlaceholder')"
-              @keydown.enter="createRedisKey" />
+            <Input v-model="createKeyName" class="dbx-editor-font-family h-8 text-xs" :disabled="creatingKey || createKeyPartiallyWritten" :placeholder="t('redis.createKeyNamePlaceholder')" @keydown.enter="createRedisKey" />
           </label>
 
           <label class="grid gap-1.5 text-xs font-medium">
             <span>{{ t("redis.createKeyType") }}</span>
-            <Select :model-value="createKeyType" :disabled="creatingKey || createKeyPartiallyWritten"
-              @update:open="onCreateKeyTypeSelectOpen" @update:model-value="onCreateKeyTypeChange">
+            <Select :model-value="createKeyType" :disabled="creatingKey || createKeyPartiallyWritten" @update:open="onCreateKeyTypeSelectOpen" @update:model-value="onCreateKeyTypeChange">
               <SelectTrigger class="h-8 text-xs" @keydown.capture="onCreateKeyTypeTriggerKeydown">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent data-naked-surface
-                class="w-auto max-w-[calc(100vw-1rem)] border-0 bg-transparent p-0 shadow-none ring-0">
-                <div class="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-start"
-                  @keydown.capture="onCreateKeyTypeSelectKeydown">
-                  <div ref="createKeyTypeListCard" class="min-w-40 rounded-md border bg-popover p-1 shadow-md"
-                    @scroll="updateCreateKeyTypeHelpOffset">
-                    <SelectItem v-for="option in createKeyTypeOptions" :key="option.value" :value="option.value"
-                      :data-option-help-value="option.value" @pointerenter="activateCreateKeyTypeHelp(option.value)"
-                      @focus="onCreateKeyTypeOptionFocus(option.value)">
+              <SelectContent data-naked-surface class="w-auto max-w-[calc(100vw-1rem)] border-0 bg-transparent p-0 shadow-none ring-0">
+                <div class="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-start" @keydown.capture="onCreateKeyTypeSelectKeydown">
+                  <div ref="createKeyTypeListCard" class="min-w-40 rounded-md border bg-popover p-1 shadow-md" @scroll="updateCreateKeyTypeHelpOffset">
+                    <SelectItem v-for="option in createKeyTypeOptions" :key="option.value" :value="option.value" :data-option-help-value="option.value" @pointerenter="activateCreateKeyTypeHelp(option.value)" @focus="onCreateKeyTypeOptionFocus(option.value)">
                       {{ option.label }}
                     </SelectItem>
                   </div>
-                  <OptionHelpPanel v-if="activeCreateKeyTypeHelpContent" ref="createKeyTypeHelpPanel"
-                    :content="activeCreateKeyTypeHelpContent" :offset-top="createKeyTypeHelpOffsetTop" />
+                  <OptionHelpPanel v-if="activeCreateKeyTypeHelpContent" ref="createKeyTypeHelpPanel" :content="activeCreateKeyTypeHelpContent" :offset-top="createKeyTypeHelpOffsetTop" />
                 </div>
               </SelectContent>
             </Select>
@@ -2385,14 +2384,12 @@ defineExpose({ focusSearch, insertCommand, executeCommand: executeAiCommand });
 
           <label v-if="createKeyType === 'hash' && createKeyRawMode" class="grid gap-1.5 text-xs font-medium">
             <span>{{ t("redis.createField") }}</span>
-            <Input v-model="createKeyField" class="dbx-editor-font-family h-8 text-xs" :disabled="creatingKey"
-              :placeholder="t('redis.createFieldPlaceholder')" @keydown.enter="createRedisKey" />
+            <Input v-model="createKeyField" class="dbx-editor-font-family h-8 text-xs" :disabled="creatingKey" :placeholder="t('redis.createFieldPlaceholder')" @keydown.enter="createRedisKey" />
           </label>
 
           <label v-if="createKeyType === 'zset' && createKeyRawMode" class="grid gap-1.5 text-xs font-medium">
             <span>{{ t("redis.createScore") }}</span>
-            <Input v-model="createKeyScore" class="dbx-editor-font-family h-8 text-xs" :disabled="creatingKey"
-              placeholder="0" @keydown.enter="createRedisKey" />
+            <Input v-model="createKeyScore" class="dbx-editor-font-family h-8 text-xs" :disabled="creatingKey" placeholder="0" @keydown.enter="createRedisKey" />
           </label>
 
           <div class="grid gap-1.5 text-xs font-medium">
@@ -2409,8 +2406,7 @@ defineExpose({ focusSearch, insertCommand, executeCommand: executeAiCommand });
             </Select>
             <label v-if="createKeyExpiryMode === 'ttl'" class="grid gap-1.5 text-xs font-medium">
               <span>{{ t("redis.createKeyTtl") }}</span>
-              <Input v-model="createKeyTtl" class="dbx-editor-font-family h-8 text-xs" :disabled="creatingKey"
-                inputmode="numeric" :placeholder="t('redis.createKeyTtlPlaceholder')" @keydown.enter="createRedisKey" />
+              <Input v-model="createKeyTtl" class="dbx-editor-font-family h-8 text-xs" :disabled="creatingKey" inputmode="numeric" :placeholder="t('redis.createKeyTtlPlaceholder')" @keydown.enter="createRedisKey" />
             </label>
             <label v-else-if="createKeyExpiryMode === 'at'" class="grid gap-1.5 text-xs font-medium">
               <span>{{ t("redis.expiryAt") }}</span>
@@ -2419,8 +2415,7 @@ defineExpose({ focusSearch, insertCommand, executeCommand: executeAiCommand });
           </div>
 
           <!-- Raw mode toggle (non-string, non-stream, non-json types) -->
-          <div v-if="createKeyType !== 'string' && createKeyType !== 'stream' && createKeyType !== 'json'"
-            class="flex items-center justify-end gap-1.5">
+          <div v-if="createKeyType !== 'string' && createKeyType !== 'stream' && createKeyType !== 'json'" class="flex items-center justify-end gap-1.5">
             <label class="flex items-center gap-1.5 text-xs text-muted-foreground">
               <span>{{ t("redis.createKeyRawMode") }}</span>
               <Switch size="sm" v-model="createKeyRawMode" :disabled="creatingKey || createKeyPartiallyWritten" />
@@ -2432,8 +2427,7 @@ defineExpose({ focusSearch, insertCommand, executeCommand: executeAiCommand });
             <!-- Stream entry ID -->
             <label v-if="createKeyType === 'stream'" class="grid gap-1.5 text-xs font-medium">
               <span>{{ t("redis.createKeyEntryId") }}</span>
-              <Input v-model="createKeyEntryId" class="dbx-editor-font-family h-8 text-xs font-mono"
-                :disabled="creatingKey" placeholder="*" />
+              <Input v-model="createKeyEntryId" class="dbx-editor-font-family h-8 text-xs font-mono" :disabled="creatingKey" placeholder="*" />
             </label>
 
             <div class="grid gap-2">
@@ -2447,26 +2441,19 @@ defineExpose({ focusSearch, insertCommand, executeCommand: executeAiCommand });
               <div v-for="(entry, idx) in createKeyEntries" :key="entry.id" class="flex items-start gap-2">
                 <!-- Hash / Stream: field + value -->
                 <template v-if="createKeyType === 'hash' || createKeyType === 'stream'">
-                  <Input v-model="entry.field" class="dbx-editor-font-family h-8 w-2/5 text-xs" :disabled="creatingKey"
-                    :placeholder="t('redis.createFieldPlaceholder')" />
-                  <Input v-model="entry.value" class="dbx-editor-font-family h-8 flex-1 text-xs" :disabled="creatingKey"
-                    :placeholder="t('redis.createValuePlaceholder')" />
+                  <Input v-model="entry.field" class="dbx-editor-font-family h-8 w-2/5 text-xs" :disabled="creatingKey" :placeholder="t('redis.createFieldPlaceholder')" />
+                  <Input v-model="entry.value" class="dbx-editor-font-family h-8 flex-1 text-xs" :disabled="creatingKey" :placeholder="t('redis.createValuePlaceholder')" />
                 </template>
                 <!-- ZSet: score + member -->
                 <template v-else-if="createKeyType === 'zset'">
-                  <Input v-model="entry.score" class="dbx-editor-font-family h-8 w-20 text-xs" :disabled="creatingKey"
-                    type="number" step="any" placeholder="0" />
-                  <Input v-model="entry.value" class="dbx-editor-font-family h-8 flex-1 text-xs" :disabled="creatingKey"
-                    :placeholder="t('redis.createMember')" />
+                  <Input v-model="entry.score" class="dbx-editor-font-family h-8 w-20 text-xs" :disabled="creatingKey" type="number" step="any" placeholder="0" />
+                  <Input v-model="entry.value" class="dbx-editor-font-family h-8 flex-1 text-xs" :disabled="creatingKey" :placeholder="t('redis.createMember')" />
                 </template>
                 <!-- List / Set: single value -->
                 <template v-else>
-                  <Input v-model="entry.value" class="dbx-editor-font-family h-8 flex-1 text-xs" :disabled="creatingKey"
-                    :placeholder="t('redis.createValuePlaceholder')" />
+                  <Input v-model="entry.value" class="dbx-editor-font-family h-8 flex-1 text-xs" :disabled="creatingKey" :placeholder="t('redis.createValuePlaceholder')" />
                 </template>
-                <Button variant="ghost" size="sm"
-                  class="h-8 w-8 shrink-0 p-0 text-muted-foreground hover:text-destructive"
-                  :disabled="creatingKey || createKeyEntries.length <= 1" @click="removeEntry(idx)">
+                <Button variant="ghost" size="sm" class="h-8 w-8 shrink-0 p-0 text-muted-foreground hover:text-destructive" :disabled="creatingKey || createKeyEntries.length <= 1" @click="removeEntry(idx)">
                   <Trash2 class="h-3.5 w-3.5" />
                 </Button>
               </div>
@@ -2474,13 +2461,9 @@ defineExpose({ focusSearch, insertCommand, executeCommand: executeAiCommand });
           </template>
 
           <!-- Raw value textarea (string, json, or raw mode for other types) -->
-          <label v-if="createKeyType === 'string' || createKeyType === 'json' || createKeyRawMode"
-            class="grid gap-1.5 text-xs font-medium">
-            <span>{{ t(createKeyType === "set" || createKeyType === "zset" ? "redis.createMember" : "redis.createValue")
-              }}</span>
-            <textarea v-model="createKeyValue"
-              class="dbx-editor-font-family min-h-28 resize-y rounded-md border bg-background p-2 text-xs outline-none focus-visible:ring-1 focus-visible:ring-ring"
-              :disabled="creatingKey" spellcheck="false" :placeholder="t('redis.createValuePlaceholder')" />
+          <label v-if="createKeyType === 'string' || createKeyType === 'json' || createKeyRawMode" class="grid gap-1.5 text-xs font-medium">
+            <span>{{ t(createKeyType === "set" || createKeyType === "zset" ? "redis.createMember" : "redis.createValue") }}</span>
+            <textarea v-model="createKeyValue" class="dbx-editor-font-family min-h-28 resize-y rounded-md border bg-background p-2 text-xs outline-none focus-visible:ring-1 focus-visible:ring-ring" :disabled="creatingKey" spellcheck="false" :placeholder="t('redis.createValuePlaceholder')" />
           </label>
 
           <p v-if="createKeyError" class="text-xs text-destructive">{{ createKeyError }}</p>
@@ -2490,9 +2473,7 @@ defineExpose({ focusSearch, insertCommand, executeCommand: executeAiCommand });
           <Button variant="ghost" :disabled="creatingKey" @click="showCreateKeyDialog = false">
             {{ t("dangerDialog.cancel") }}
           </Button>
-          <Button
-            :disabled="creatingKey || checkingJsonModule || (createKeyType === 'json' && jsonModuleAvailable !== true)"
-            @click="createRedisKey">
+          <Button :disabled="creatingKey || checkingJsonModule || (createKeyType === 'json' && jsonModuleAvailable !== true)" @click="createRedisKey">
             <Loader2 v-if="creatingKey" class="h-4 w-4 animate-spin" />
             <Plus v-else class="h-4 w-4" />
             {{ t("redis.createKeySubmit") }}
@@ -2594,7 +2575,7 @@ defineExpose({ focusSearch, insertCommand, executeCommand: executeAiCommand });
   contain: layout style paint;
 }
 
-.redis-workspace-splitpanes> :deep(.splitpanes__pane:first-child) {
+.redis-workspace-splitpanes > :deep(.splitpanes__pane:first-child) {
   min-width: min(256px, 64%);
 }
 
