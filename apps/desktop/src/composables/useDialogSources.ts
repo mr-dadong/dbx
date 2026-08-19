@@ -2,6 +2,7 @@ import { ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { useConnectionStore } from "@/stores/connectionStore";
 import { useToast } from "@/composables/useToast";
+import { saveExportPassphrase } from "@/lib/backend/exportPassphraseStorage";
 import { hasSidebarLayoutEntries } from "@/lib/sidebar/sidebarLayout";
 import type { SidebarLayout } from "@/types/database";
 
@@ -276,6 +277,8 @@ export function useDialogSources() {
   async function onExportConfirm(passphrase: string) {
     try {
       await connectionStore.exportConnectionsToFile(passphrase);
+      // 导出成功后保存密码短语，下次打开加密导出对话框时自动回显
+      saveExportPassphrase(passphrase);
       showConfigPassphraseDialog.value = false;
       toast(t("configExport.exportSuccess"), 2000);
     } catch (e: any) {

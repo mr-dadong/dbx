@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import PasswordInput from "@/components/ui/PasswordInput.vue";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { loadSavedExportPassphrase } from "@/lib/backend/exportPassphraseStorage";
 
 const props = defineProps<{
   open: boolean;
@@ -25,15 +26,14 @@ const dialogOpen = computed({
 });
 
 const passphrase = ref("");
-const passphraseConfirm = ref("");
 const error = ref("");
 
 watch(
   dialogOpen,
   (open) => {
     if (open) {
-      passphrase.value = "";
-      passphraseConfirm.value = "";
+      // 导出模式自动回显上次使用的密码短语（PasswordInput 默认掩码显示，可点眼睛图标查看明文）；导入模式始终从空开始
+      passphrase.value = props.mode === "export" ? loadSavedExportPassphrase() : "";
       error.value = "";
     }
   },
@@ -43,10 +43,6 @@ watch(
 function confirm() {
   if (!passphrase.value) {
     error.value = t("configExport.passphraseRequired");
-    return;
-  }
-  if (props.mode === "export" && passphrase.value !== passphraseConfirm.value) {
-    error.value = t("configExport.passphraseMismatch");
     return;
   }
   if (props.mode === "export" && passphrase.value.length < 4) {
@@ -76,12 +72,7 @@ const displayError = computed(() => error.value || props.externalError || "");
 
         <div class="grid gap-2">
           <Label>{{ t("configExport.passphrase") }}</Label>
-          <PasswordInput v-model="passphrase" :placeholder="t('configExport.passphrasePlaceholder')" :toggle-tab-index="-1" @keydown.enter="mode === 'import' ? confirm() : undefined" />
-        </div>
-
-        <div v-if="mode === 'export'" class="grid gap-2">
-          <Label>{{ t("configExport.passphraseConfirm") }}</Label>
-          <PasswordInput v-model="passphraseConfirm" :placeholder="t('configExport.passphraseConfirmPlaceholder')" :toggle-tab-index="-1" @keydown.enter="confirm" />
+          <PasswordInput v-model="passphrase" :placeholder="t('configExport.passphrasePlaceholder')" :toggle-tab-index="-1" @keydown.enter="confirm" />
         </div>
 
         <p v-if="displayError" class="text-sm text-destructive">{{ displayError }}</p>
