@@ -2161,30 +2161,26 @@ where
         let (next_cursor, keys) = parse_scan_keys(raw)?;
 
         if !keys.is_empty() {
-            // 同一条 pipeline 先批量查 TYPE 再批量查 TTL：两条都是 O(1) 命令，
-            // 合并后仍只有一次网络往返，避免逐 key 查询（N+1）。
-            // TTL 是列表页展示过期信息的数据来源；include_types=false 的
-            // 全量拉取链路（百万 key 场景）完全不发这两类命令，保持零额外开销。
             let (key_types, key_ttls): (Vec<String>, Vec<i64>) = if include_types {
-                let key_count = keys.len();
-                let mut pipe = redis::pipe();
+                let mut type_pipe = redis::pipe();
                 for key in &keys {
-                    pipe.cmd("TYPE").arg(key);
+                    type_pipe.cmd("TYPE").arg(key);
                 }
-                for key in &keys {
-                    pipe.cmd("TTL").arg(key);
-                }
-                // TYPE 返回状态字符串、TTL 返回整数，返回类型不同，
-                // 因此先按 Redis 原始值整体接收，再按“前 N 个 TYPE、后 N 个 TTL”拆开解析。
-                let values: Vec<RedisRawValue> = pipe.query_async(con).await.unwrap_or_default();
-                let types = values
+                let type_count = type_pipe.len();
+                let type_values = con.req_packed_commands(&type_pipe, 0, type_count).await.unwrap_or_default();
+                let key_types = type_values
                     .iter()
-                    .take(key_count)
                     .map(|value| String::from_redis_value(value).unwrap_or_else(|_| "unknown".to_string()))
                     .collect();
-                let ttls =
-                    values.iter().skip(key_count).map(|value| i64::from_redis_value(value).unwrap_or(-2)).collect();
-                (types, ttls)
+
+                let mut ttl_pipe = redis::pipe();
+                for key in &keys {
+                    ttl_pipe.cmd("TTL").arg(key);
+                }
+                let ttl_count = ttl_pipe.len();
+                let ttl_values = con.req_packed_commands(&ttl_pipe, 0, ttl_count).await.unwrap_or_default();
+                let key_ttls = ttl_values.iter().map(|value| i64::from_redis_value(value).unwrap_or(-2)).collect();
+                (key_types, key_ttls)
             } else {
                 (Vec::new(), Vec::new())
             };
@@ -2204,7 +2200,6 @@ where
                     key_display: redis_key_bytes_to_display(key),
                     key_raw: redis_key_bytes_to_raw(key),
                     key_type,
-                    // -1 表示永不过期；-2 表示本次未查询到 TTL（pipeline 失败或被跳过）
                     ttl: key_ttls.get(index).copied().unwrap_or(-2),
                     size: 0,
                     value_preview,
@@ -4387,11 +4382,10 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn scan_keys_batch_pipelines_ttl_alongside_types() {
+    async fn scan_keys_batch_batches_type_and_ttl_metadata() {
         let mut con = FakeRedisConnection::new(vec![
             RedisRawValue::Int(2),
             scan_response("0", vec!["session:a", "cache:b"]),
-            // pipeline 内前 N 个响应是 TYPE，后 N 个是 TTL
             RedisRawValue::SimpleString("string".to_string()),
             RedisRawValue::SimpleString("hash".to_string()),
             RedisRawValue::Int(-1),
@@ -4405,11 +4399,32 @@ mod tests {
         assert_eq!(result.keys[0].ttl, -1);
         assert_eq!(result.keys[1].key_type, "hash");
         assert_eq!(result.keys[1].ttl, 3600);
-        // FakeRedisConnection 按打包请求数统计，TYPE/TTL 同在一条 pipeline 里；
-        // 这里直接统计打包内容中命令出现的次数，验证两类命令各批量发送了 2 次
-        let pipeline_packed = con.commands.iter().find(|packed| packed.contains("\r\nTYPE\r\n")).cloned().unwrap();
-        assert_eq!(pipeline_packed.matches("\r\nTYPE\r\n").count(), 2);
-        assert_eq!(pipeline_packed.matches("\r\nTTL\r\n").count(), 2);
+        let type_pipeline = con.commands.iter().find(|packed| packed.contains("\r\nTYPE\r\n")).unwrap();
+        let ttl_pipeline = con.commands.iter().find(|packed| packed.contains("\r\nTTL\r\n")).unwrap();
+        assert_eq!(type_pipeline.matches("\r\nTYPE\r\n").count(), 2);
+        assert_eq!(type_pipeline.matches("\r\nTTL\r\n").count(), 0);
+        assert_eq!(ttl_pipeline.matches("\r\nTYPE\r\n").count(), 0);
+        assert_eq!(ttl_pipeline.matches("\r\nTTL\r\n").count(), 2);
+    }
+
+    #[tokio::test]
+    async fn scan_keys_batch_preserves_types_when_one_ttl_command_fails() {
+        let mut con = FakeRedisConnection::new(vec![
+            RedisRawValue::Int(2),
+            scan_response("0", vec!["session:a", "cache:b"]),
+            RedisRawValue::SimpleString("string".to_string()),
+            RedisRawValue::SimpleString("hash".to_string()),
+            redis::parse_redis_value(b"-NOPERM this user has no permissions to run the 'ttl' command\r\n").unwrap(),
+            RedisRawValue::Int(3600),
+        ]);
+
+        let result = super::scan_keys_batch(&mut con, 0, "*", 100, 1, true).await.unwrap();
+
+        assert_eq!(result.keys.len(), 2);
+        assert_eq!(result.keys[0].key_type, "string");
+        assert_eq!(result.keys[0].ttl, -2);
+        assert_eq!(result.keys[1].key_type, "hash");
+        assert_eq!(result.keys[1].ttl, 3600);
     }
 
     #[tokio::test]

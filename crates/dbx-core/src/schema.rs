@@ -8740,21 +8740,9 @@ mod ddl_tests {
 
     #[test]
     fn table_structure_export_includes_partition_tree() {
-        // EXPORT/RELATION_EXPORT/DISPLAY 均为编译期常量，断言放进 const 块里在编译期校验：
-        // 常量一旦被改错，编译立即失败，比运行时断言更早发现问题（clippy::assertions_on_constants）。
-        const {
-            assert!(TableDdlOptions::EXPORT.include_partitions);
-            assert!(TableDdlOptions::EXPORT.portable_oracle);
-            assert!(!TableDdlOptions::EXPORT.include_postgres_access);
-
-            assert!(!TableDdlOptions::RELATION_EXPORT.include_partitions);
-            assert!(TableDdlOptions::RELATION_EXPORT.portable_oracle);
-            assert!(!TableDdlOptions::RELATION_EXPORT.include_postgres_access);
-
-            assert!(TableDdlOptions::DISPLAY.include_partitions);
-            assert!(!TableDdlOptions::DISPLAY.portable_oracle);
-            assert!(TableDdlOptions::DISPLAY.include_postgres_access);
-        }
+        assert_table_ddl_options(TableDdlOptions::EXPORT, true, true, false);
+        assert_table_ddl_options(TableDdlOptions::RELATION_EXPORT, false, true, false);
+        assert_table_ddl_options(TableDdlOptions::DISPLAY, true, false, true);
     }
 
     #[test]

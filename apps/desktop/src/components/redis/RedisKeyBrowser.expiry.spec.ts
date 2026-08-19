@@ -62,11 +62,7 @@ vi.mock("@/lib/redis/redisKeyTree", async (importOriginal) => {
 vi.mock("@/stores/connectionStore", () => ({
   useConnectionStore: () => ({
     ensureConnected: vi.fn().mockResolvedValue(undefined),
-    getConfig: () => ({
-      name: "Redis",
-      redis_key_separator: ":",
-      redis_scan_page_size: mocks.redisScanPageSize,
-    }),
+    getConfig: () => ({ name: "Redis", redis_key_separator: ":", redis_scan_page_size: mocks.redisScanPageSize }),
     updateRedisDbKeyStats: mocks.updateRedisDbKeyStats,
     listRedisCompletionCommandDocs: mocks.listRedisCompletionCommandDocs,
     listRedisCompletionKeys: mocks.listRedisCompletionKeys,
@@ -218,21 +214,12 @@ vi.mock("@/components/ui/tabs", async () => {
       () =>
         h("div", attrs, slots.default?.()),
   });
-  return {
-    Tabs: slotContainer,
-    TabsContent: slotContainer,
-    TabsList: slotContainer,
-    TabsTrigger: slotContainer,
-  };
+  return { Tabs: slotContainer, TabsContent: slotContainer, TabsList: slotContainer, TabsTrigger: slotContainer };
 });
 
 vi.mock("@/components/ui/switch", async () => {
   const { defineComponent, h } = await import("vue");
-  return {
-    Switch: defineComponent({
-      setup: () => () => h("button", { type: "button" }),
-    }),
-  };
+  return { Switch: defineComponent({ setup: () => () => h("button", { type: "button" }) }) };
 });
 
 vi.mock("@/components/ui/date-time-picker/DateTimePicker.vue", async () => {
@@ -352,91 +339,28 @@ const KEY_RAW = "bmV3LWtleQ==";
 const mountedApps: Array<{ unmount: () => void; host: HTMLElement }> = [];
 
 type CreateType = "string" | "hash" | "list" | "set" | "zset" | "stream" | "json";
-type TestSelectRoot = HTMLElement & {
-  selectTestValue?: (value: string) => void;
-};
+type TestSelectRoot = HTMLElement & { selectTestValue?: (value: string) => void };
 function redisValue(keyRaw = KEY_RAW) {
   return {
     key_display: KEY_NAME,
     key_raw: keyRaw,
     ttl: 90,
     redis_type: "string" as const,
-    data: {
-      kind: "string" as const,
-      content: { raw_base64: "dmFsdWU=", encoding: "utf8" as const },
-    },
+    data: { kind: "string" as const, content: { raw_base64: "dmFsdWU=", encoding: "utf8" as const } },
   };
 }
 
 function redisKeyInfo(keyType = "json") {
-  return {
-    key_display: KEY_NAME,
-    key_raw: KEY_RAW,
-    key_type: keyType,
-    ttl: 90,
-    size: 7,
-    value_preview: "{}",
-  };
+  return { key_display: KEY_NAME, key_raw: KEY_RAW, key_type: keyType, ttl: 90, size: 7, value_preview: "{}" };
 }
 
 const completionCommands = [
-  {
-    name: "GET",
-    group: "string",
-    arity: 2,
-    keySpecs: [
-      {
-        beginSearch: { type: "index" as const, index: 1 },
-        findKeys: { type: "range" as const, lastKey: 0, keyStep: 1, limit: 0 },
-      },
-    ],
-  },
-  {
-    name: "GETEX",
-    group: "string",
-    arity: -2,
-    keySpecs: [
-      {
-        beginSearch: { type: "index" as const, index: 1 },
-        findKeys: { type: "range" as const, lastKey: 0, keyStep: 1, limit: 0 },
-      },
-    ],
-  },
-  {
-    name: "GETSET",
-    group: "string",
-    arity: 3,
-    keySpecs: [
-      {
-        beginSearch: { type: "index" as const, index: 1 },
-        findKeys: { type: "range" as const, lastKey: 0, keyStep: 1, limit: 0 },
-      },
-    ],
-  },
+  { name: "GET", group: "string", arity: 2, keySpecs: [{ beginSearch: { type: "index" as const, index: 1 }, findKeys: { type: "range" as const, lastKey: 0, keyStep: 1, limit: 0 } }] },
+  { name: "GETEX", group: "string", arity: -2, keySpecs: [{ beginSearch: { type: "index" as const, index: 1 }, findKeys: { type: "range" as const, lastKey: 0, keyStep: 1, limit: 0 } }] },
+  { name: "GETSET", group: "string", arity: 3, keySpecs: [{ beginSearch: { type: "index" as const, index: 1 }, findKeys: { type: "range" as const, lastKey: 0, keyStep: 1, limit: 0 } }] },
   { name: "PING", group: "connection", arity: -1, keySpecs: [] },
-  {
-    name: "SET",
-    group: "string",
-    arity: -3,
-    keySpecs: [
-      {
-        beginSearch: { type: "index" as const, index: 1 },
-        findKeys: { type: "range" as const, lastKey: 0, keyStep: 1, limit: 0 },
-      },
-    ],
-  },
-  {
-    name: "VGET",
-    group: "string",
-    arity: 2,
-    summary: "Reads a vendor key.",
-    keySpecs: [
-      {
-        beginSearch: { type: "index" as const, index: 1 },
-        findKeys: { type: "range" as const, lastKey: 0, keyStep: 1, limit: 0 },
-      },
-    ],
-  },
+  { name: "SET", group: "string", arity: -3, keySpecs: [{ beginSearch: { type: "index" as const, index: 1 }, findKeys: { type: "range" as const, lastKey: 0, keyStep: 1, limit: 0 } }] },
+  { name: "VGET", group: "string", arity: 2, summary: "Reads a vendor key.", keySpecs: [{ beginSearch: { type: "index" as const, index: 1 }, findKeys: { type: "range" as const, lastKey: 0, keyStep: 1, limit: 0 } }] },
 ];
 
 function deferred<T>() {
@@ -455,11 +379,7 @@ function resetApiMocks() {
   mocks.infiniteScroll = false;
   mocks.queryResultMaxRowsEnabled = true;
   mocks.queryResultMaxRows = 5000;
-  mocks.redisScanKeysBatch.mockResolvedValue({
-    cursor: 0,
-    keys: [],
-    total_keys: 0,
-  });
+  mocks.redisScanKeysBatch.mockResolvedValue({ cursor: 0, keys: [], total_keys: 0 });
   mocks.redisGetValue.mockImplementation((_connectionId: string, _db: number, keyRaw: string) => Promise.resolve(redisValue(keyRaw)));
   mocks.redisSetString.mockResolvedValue(undefined);
   mocks.redisJsonSet.mockResolvedValue(undefined);
@@ -483,20 +403,8 @@ function resetApiMocks() {
 function mountBrowser() {
   const host = document.createElement("div");
   document.body.append(host);
-  const app = createApp(RedisKeyBrowser, {
-    connectionId: "connection",
-    db: 0,
-    blockDangerousRedisCommands: false,
-  });
-  app.use(
-    createI18n({
-      legacy: false,
-      locale: "en",
-      messages: { en: {} },
-      missingWarn: false,
-      fallbackWarn: false,
-    }),
-  );
+  const app = createApp(RedisKeyBrowser, { connectionId: "connection", db: 0, blockDangerousRedisCommands: false });
+  app.use(createI18n({ legacy: false, locale: "en", messages: { en: {} }, missingWarn: false, fallbackWarn: false }));
   app.mount(host);
   mountedApps.push({ unmount: () => app.unmount(), host });
   return host;
@@ -510,24 +418,11 @@ function mountScopedBrowser() {
   const app = createApp(
     defineComponent({
       setup() {
-        return () =>
-          h(RedisKeyBrowser, {
-            connectionId: connectionId.value,
-            db: db.value,
-            blockDangerousRedisCommands: false,
-          });
+        return () => h(RedisKeyBrowser, { connectionId: connectionId.value, db: db.value, blockDangerousRedisCommands: false });
       },
     }),
   );
-  app.use(
-    createI18n({
-      legacy: false,
-      locale: "en",
-      messages: { en: {} },
-      missingWarn: false,
-      fallbackWarn: false,
-    }),
-  );
+  app.use(createI18n({ legacy: false, locale: "en", messages: { en: {} }, missingWarn: false, fallbackWarn: false }));
   app.mount(host);
   mountedApps.push({ unmount: () => app.unmount(), host });
 
@@ -550,27 +445,12 @@ function mountKeptAliveBrowser() {
       setup() {
         return () =>
           h(KeepAlive, null, {
-            default: () =>
-              active.value
-                ? h(RedisKeyBrowser, {
-                    connectionId: "connection",
-                    db: 0,
-                    blockDangerousRedisCommands: false,
-                  })
-                : null,
+            default: () => (active.value ? h(RedisKeyBrowser, { connectionId: "connection", db: 0, blockDangerousRedisCommands: false }) : null),
           });
       },
     }),
   );
-  app.use(
-    createI18n({
-      legacy: false,
-      locale: "en",
-      messages: { en: {} },
-      missingWarn: false,
-      fallbackWarn: false,
-    }),
-  );
+  app.use(createI18n({ legacy: false, locale: "en", messages: { en: {} }, missingWarn: false, fallbackWarn: false }));
   app.mount(host);
   mountedApps.push({ unmount: () => app.unmount(), host });
 
@@ -758,24 +638,11 @@ afterEach(() => {
 
 describe("RedisKeyBrowser scope changes", () => {
   it("reloads the new database and discards a late scan from the previous one", async () => {
-    const previousDatabase = deferred<{
-      cursor: number;
-      keys: RedisKeyInfo[];
-      total_keys: number;
-    }>();
-    const currentKey = {
-      key_display: "db1-key",
-      key_raw: "ZGIxLWtleQ==",
-      key_type: "string",
-      ttl: -1,
-    };
+    const previousDatabase = deferred<{ cursor: number; keys: RedisKeyInfo[]; total_keys: number }>();
+    const currentKey = { key_display: "db1-key", key_raw: "ZGIxLWtleQ==", key_type: "string", ttl: -1 };
     mocks.redisScanKeysBatch.mockImplementation((_connectionId: string, db: number) => {
       if (db === 0) return previousDatabase.promise;
-      return Promise.resolve({
-        cursor: 0,
-        keys: [currentKey],
-        total_keys: 1,
-      });
+      return Promise.resolve({ cursor: 0, keys: [currentKey], total_keys: 1 });
     });
     const browser = mountScopedBrowser();
     await settle();
@@ -787,14 +654,7 @@ describe("RedisKeyBrowser scope changes", () => {
     expect(mocks.redisScanKeysBatch).toHaveBeenCalledWith("connection", 1, 0, "*", 100, 8, true);
     previousDatabase.resolve({
       cursor: 0,
-      keys: [
-        {
-          key_display: "db0-key",
-          key_raw: "ZGIwLWtleQ==",
-          key_type: "string",
-          ttl: -1,
-        },
-      ],
+      keys: [{ key_display: "db0-key", key_raw: "ZGIwLWtleQ==", key_type: "string", ttl: -1 }],
       total_keys: 1,
     });
     await settle();
@@ -941,13 +801,7 @@ describe("RedisKeyBrowser command completion", () => {
     expect(commandCompletionLabels()).toContain("VGETReads a vendor key.string");
 
     const input = requiredElement<HTMLInputElement>("[data-redis-command-input]");
-    input.dispatchEvent(
-      new KeyboardEvent("keydown", {
-        key: "Tab",
-        shiftKey: true,
-        bubbles: true,
-      }),
-    );
+    input.dispatchEvent(new KeyboardEvent("keydown", { key: "Tab", shiftKey: true, bubbles: true }));
     await settle();
     expect(input.value).toBe("VGE");
 
@@ -1016,14 +870,8 @@ describe("RedisKeyBrowser command completion", () => {
     expect(input.getAttribute("aria-activedescendant")).toBe(options[1]!.id);
 
     listbox.scrollTop = 20;
-    vi.spyOn(listbox, "getBoundingClientRect").mockReturnValue({
-      top: 100,
-      bottom: 200,
-    } as DOMRect);
-    vi.spyOn(options[2]!, "getBoundingClientRect").mockReturnValue({
-      top: 180,
-      bottom: 224,
-    } as DOMRect);
+    vi.spyOn(listbox, "getBoundingClientRect").mockReturnValue({ top: 100, bottom: 200 } as DOMRect);
+    vi.spyOn(options[2]!, "getBoundingClientRect").mockReturnValue({ top: 180, bottom: 224 } as DOMRect);
     input.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }));
     await settle();
     expect(options.filter((option) => option.getAttribute("aria-selected") === "true")).toEqual([options[2]]);
@@ -1033,14 +881,8 @@ describe("RedisKeyBrowser command completion", () => {
     await settle();
     expect(options.filter((option) => option.getAttribute("aria-selected") === "true")).toEqual([options[2]]);
 
-    vi.spyOn(options[1]!, "getBoundingClientRect").mockReturnValue({
-      top: 76,
-      bottom: 120,
-    } as DOMRect);
-    vi.spyOn(options[0]!, "getBoundingClientRect").mockReturnValue({
-      top: 100,
-      bottom: 144,
-    } as DOMRect);
+    vi.spyOn(options[1]!, "getBoundingClientRect").mockReturnValue({ top: 76, bottom: 120 } as DOMRect);
+    vi.spyOn(options[0]!, "getBoundingClientRect").mockReturnValue({ top: 100, bottom: 144 } as DOMRect);
     input.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowUp", bubbles: true }));
     input.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowUp", bubbles: true }));
     input.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowUp", bubbles: true }));
@@ -1059,12 +901,7 @@ describe("RedisKeyBrowser command completion", () => {
         keySpecs: [],
         arguments: [
           { name: "count", token: "COUNT", type: "integer", optional: true },
-          {
-            name: "streams",
-            token: "STREAMS",
-            type: "block",
-            arguments: [{ name: "key", type: "key", multiple: true }],
-          },
+          { name: "streams", token: "STREAMS", type: "block", arguments: [{ name: "key", type: "key", multiple: true }] },
         ],
       },
     ]);
@@ -1251,11 +1088,7 @@ describe("RedisKeyBrowser expiry creation", () => {
   });
 
   it("removes an existing RedisJSON key only after recovery confirms its deletion", async () => {
-    mocks.redisScanKeysBatch.mockResolvedValueOnce({
-      cursor: 0,
-      keys: [redisKeyInfo()],
-      total_keys: 1,
-    });
+    mocks.redisScanKeysBatch.mockResolvedValueOnce({ cursor: 0, keys: [redisKeyInfo()], total_keys: 1 });
     mocks.redisSetTtl.mockRejectedValueOnce(new Error("TTL command failed"));
     mocks.redisGetValue.mockRejectedValueOnce(new Error("RedisJSON key no longer exists")).mockRejectedValueOnce(new Error("RedisJSON key no longer exists"));
     mountBrowser();
@@ -1269,19 +1102,12 @@ describe("RedisKeyBrowser expiry creation", () => {
     await settle();
 
     expect(mocks.redisGetValue).toHaveBeenCalledTimes(2);
-    expect(mocks.updateRedisDbKeyStats).toHaveBeenCalledWith("connection", 0, {
-      loaded: 0,
-      totalDelta: -1,
-    });
+    expect(mocks.updateRedisDbKeyStats).toHaveBeenCalledWith("connection", 0, { loaded: 0, totalDelta: -1 });
     expect(mocks.toast).toHaveBeenCalledWith("TTL command failed", 5000);
   });
 
   it("keeps an existing RedisJSON key when retry cannot confirm its deletion", async () => {
-    mocks.redisScanKeysBatch.mockResolvedValueOnce({
-      cursor: 0,
-      keys: [redisKeyInfo()],
-      total_keys: 1,
-    });
+    mocks.redisScanKeysBatch.mockResolvedValueOnce({ cursor: 0, keys: [redisKeyInfo()], total_keys: 1 });
     mocks.redisSetTtl.mockRejectedValueOnce(new Error("TTL command failed"));
     mocks.redisGetValue.mockRejectedValueOnce(new Error("RedisJSON key no longer exists")).mockRejectedValueOnce(new Error("network unavailable"));
     mountBrowser();
@@ -1307,22 +1133,13 @@ describe("RedisKeyBrowser fuzzy key hierarchy", () => {
     clickButtonWithText("redis.fuzzyMatch");
     await settle();
 
-    const target = {
-      key_display: "issue5012:target",
-      key_raw: "aXNzdWU1MDEyOnRhcmdldA==",
-      key_type: "string",
-      ttl: -1,
-    };
+    const target = { key_display: "issue5012:target", key_raw: "aXNzdWU1MDEyOnRhcmdldA==", key_type: "string", ttl: -1 };
     let batch = 0;
     mocks.redisScanKeysBatch.mockReset();
     mocks.redisScanKeysBatch.mockImplementation(() => {
       batch += 1;
       if (batch === 8) return Promise.resolve({ cursor: 801, keys: [target], total_keys: 0 });
-      return Promise.resolve({
-        cursor: batch * 100,
-        keys: [],
-        total_keys: batch === 1 ? 200_000 : 0,
-      });
+      return Promise.resolve({ cursor: batch * 100, keys: [], total_keys: batch === 1 ? 200_000 : 0 });
     });
 
     await submitKeySearch("issue5012:target");
@@ -1352,11 +1169,7 @@ describe("RedisKeyBrowser fuzzy key hierarchy", () => {
     mocks.redisScanKeysBatch.mockReset();
     mocks.redisScanKeysBatch.mockImplementation(() => {
       batch += 1;
-      return Promise.resolve({
-        cursor: batch,
-        keys: [],
-        total_keys: batch === 1 ? 5_000_000 : 0,
-      });
+      return Promise.resolve({ cursor: batch, keys: [], total_keys: batch === 1 ? 5_000_000 : 0 });
     });
 
     await submitKeySearch("missing-key");
@@ -1383,34 +1196,15 @@ describe("RedisKeyBrowser fuzzy key hierarchy", () => {
     clickButtonWithText("redis.fuzzyMatch");
     await settle();
 
-    const first = {
-      key_display: "issue5012:first",
-      key_raw: "aXNzdWU1MDEyOmZpcnN0",
-      key_type: "string",
-      ttl: -1,
-    };
-    const next = {
-      key_display: "issue5012:next",
-      key_raw: "aXNzdWU1MDEyOm5leHQ=",
-      key_type: "string",
-      ttl: -1,
-    };
+    const first = { key_display: "issue5012:first", key_raw: "aXNzdWU1MDEyOmZpcnN0", key_type: "string", ttl: -1 };
+    const next = { key_display: "issue5012:next", key_raw: "aXNzdWU1MDEyOm5leHQ=", key_type: "string", ttl: -1 };
     let continuationBatch = 0;
     mocks.redisScanKeysBatch.mockReset();
     mocks.redisScanKeysBatch.mockImplementation((_connectionId: string, _db: number, cursor: number) => {
-      if (cursor === 0)
-        return Promise.resolve({
-          cursor: 1,
-          keys: [first],
-          total_keys: 200_000,
-        });
+      if (cursor === 0) return Promise.resolve({ cursor: 1, keys: [first], total_keys: 200_000 });
       continuationBatch += 1;
       if (continuationBatch === 8) return Promise.resolve({ cursor: 0, keys: [next], total_keys: 0 });
-      return Promise.resolve({
-        cursor: continuationBatch + 1,
-        keys: [],
-        total_keys: 0,
-      });
+      return Promise.resolve({ cursor: continuationBatch + 1, keys: [], total_keys: 0 });
     });
 
     await submitKeySearch("issue5012");
@@ -1435,17 +1229,8 @@ describe("RedisKeyBrowser fuzzy key hierarchy", () => {
     clickButtonWithText("redis.fuzzyMatch");
     await settle();
 
-    const oldPage = deferred<{
-      cursor: number;
-      keys: RedisKeyInfo[];
-      total_keys: number;
-    }>();
-    const fresh = {
-      key_display: "new:result",
-      key_raw: "bmV3OnJlc3VsdA==",
-      key_type: "string",
-      ttl: -1,
-    };
+    const oldPage = deferred<{ cursor: number; keys: RedisKeyInfo[]; total_keys: number }>();
+    const fresh = { key_display: "new:result", key_raw: "bmV3OnJlc3VsdA==", key_type: "string", ttl: -1 };
     mocks.redisScanKeysBatch.mockReset();
     mocks.redisScanKeysBatch.mockImplementation((_connectionId: string, _db: number, _cursor: number, pattern: string) => {
       if (pattern === "*old*") return oldPage.promise;
@@ -1474,64 +1259,21 @@ describe("RedisKeyBrowser fuzzy key hierarchy", () => {
     clickButtonWithText("redis.fuzzyMatch");
     await settle();
 
-    const oldContinuation = deferred<{
-      cursor: number;
-      keys: RedisKeyInfo[];
-      total_keys: number;
-    }>();
-    const currentContinuation = deferred<{
-      cursor: number;
-      keys: RedisKeyInfo[];
-      total_keys: number;
-    }>();
-    const oldInitial = {
-      key_display: "old:initial",
-      key_raw: "b2xkOmluaXRpYWw=",
-      key_type: "string",
-      ttl: -1,
-    };
-    const currentInitial = {
-      key_display: "new:initial",
-      key_raw: "bmV3OmluaXRpYWw=",
-      key_type: "string",
-      ttl: -1,
-    };
-    const currentFirstPage = {
-      key_display: "new:first-page",
-      key_raw: "bmV3OmZpcnN0LXBhZ2U=",
-      key_type: "string",
-      ttl: -1,
-    };
-    const currentLastPage = {
-      key_display: "new:last-page",
-      key_raw: "bmV3Omxhc3QtcGFnZQ==",
-      key_type: "string",
-      ttl: -1,
-    };
+    const oldContinuation = deferred<{ cursor: number; keys: RedisKeyInfo[]; total_keys: number }>();
+    const currentContinuation = deferred<{ cursor: number; keys: RedisKeyInfo[]; total_keys: number }>();
+    const oldInitial = { key_display: "old:initial", key_raw: "b2xkOmluaXRpYWw=", key_type: "string", ttl: -1 };
+    const currentInitial = { key_display: "new:initial", key_raw: "bmV3OmluaXRpYWw=", key_type: "string", ttl: -1 };
+    const currentFirstPage = { key_display: "new:first-page", key_raw: "bmV3OmZpcnN0LXBhZ2U=", key_type: "string", ttl: -1 };
+    const currentLastPage = { key_display: "new:last-page", key_raw: "bmV3Omxhc3QtcGFnZQ==", key_type: "string", ttl: -1 };
     mocks.redisScanKeysBatch.mockReset();
     mocks.redisScanKeysBatch.mockImplementation((_connectionId: string, _db: number, cursor: number, pattern: string) => {
       if (pattern === "*old*") {
-        if (cursor === 0)
-          return Promise.resolve({
-            cursor: 11,
-            keys: [oldInitial],
-            total_keys: 100,
-          });
+        if (cursor === 0) return Promise.resolve({ cursor: 11, keys: [oldInitial], total_keys: 100 });
         return oldContinuation.promise;
       }
       if (pattern === "*new*") {
-        if (cursor === 0)
-          return Promise.resolve({
-            cursor: 21,
-            keys: [currentInitial],
-            total_keys: 100,
-          });
-        if (cursor === 21)
-          return Promise.resolve({
-            cursor: 22,
-            keys: [currentFirstPage],
-            total_keys: 0,
-          });
+        if (cursor === 0) return Promise.resolve({ cursor: 21, keys: [currentInitial], total_keys: 100 });
+        if (cursor === 21) return Promise.resolve({ cursor: 22, keys: [currentFirstPage], total_keys: 0 });
         if (cursor === 22) return currentContinuation.promise;
       }
       return Promise.resolve({ cursor: 0, keys: [], total_keys: 0 });
@@ -1570,11 +1312,7 @@ describe("RedisKeyBrowser fuzzy key hierarchy", () => {
     await settle();
     expect(mocks.redisScanKeysBatch.mock.calls.filter((call) => call[2] === 22)).toHaveLength(1);
 
-    currentContinuation.resolve({
-      cursor: 0,
-      keys: [currentLastPage],
-      total_keys: 0,
-    });
+    currentContinuation.resolve({ cursor: 0, keys: [currentLastPage], total_keys: 0 });
     await vi.waitFor(() => expect(Array.from(document.querySelectorAll<HTMLButtonElement>("button")).filter((button) => button.textContent?.includes("redis.loadMoreKeys"))).toHaveLength(0));
     const labels = Array.from(document.querySelectorAll<HTMLElement>(".dbx-editor-font-family")).map((element) => element.textContent);
     expect(labels).toContain("new");
@@ -1585,24 +1323,10 @@ describe("RedisKeyBrowser fuzzy key hierarchy", () => {
     const firstKeyRaw = "cmF3LWZpcnN0";
     const secondKeyRaw = "cmF3LXNlY29uZA==";
     const keys = [
-      {
-        key_display: `a\0b:c:x`,
-        key_raw: firstKeyRaw,
-        key_type: "string",
-        ttl: -1,
-      },
-      {
-        key_display: `a:b\0c:y`,
-        key_raw: secondKeyRaw,
-        key_type: "string",
-        ttl: -1,
-      },
+      { key_display: `a\0b:c:x`, key_raw: firstKeyRaw, key_type: "string", ttl: -1 },
+      { key_display: `a:b\0c:y`, key_raw: secondKeyRaw, key_type: "string", ttl: -1 },
     ];
-    mocks.redisScanKeysBatch.mockResolvedValue({
-      cursor: 0,
-      keys,
-      total_keys: keys.length,
-    });
+    mocks.redisScanKeysBatch.mockResolvedValue({ cursor: 0, keys, total_keys: keys.length });
     mocks.redisDeleteKeys.mockResolvedValue(1);
     mountBrowser();
     await settle();
@@ -1626,32 +1350,13 @@ describe("RedisKeyBrowser fuzzy key hierarchy", () => {
 
   it("keeps regular key searches flat, then selects and deletes a loaded fuzzy branch", async () => {
     const keys = [
-      {
-        key_display: "user:profile:email",
-        key_raw: "cmF3LWVtYWls",
-        key_type: "string",
-        ttl: -1,
-      },
-      {
-        key_display: "user:profile:name",
-        key_raw: "cmF3LW5hbWU=",
-        key_type: "string",
-        ttl: -1,
-      },
-      {
-        key_display: "user:settings",
-        key_raw: "cmF3LXNldHRpbmdz",
-        key_type: "hash",
-        ttl: -1,
-      },
+      { key_display: "user:profile:email", key_raw: "cmF3LWVtYWls", key_type: "string", ttl: -1 },
+      { key_display: "user:profile:name", key_raw: "cmF3LW5hbWU=", key_type: "string", ttl: -1 },
+      { key_display: "user:settings", key_raw: "cmF3LXNldHRpbmdz", key_type: "hash", ttl: -1 },
     ];
     // The first page is intentionally incomplete: branch selection must only
     // submit the currently loaded raw keys, never widen into a new SCAN.
-    mocks.redisScanKeysBatch.mockResolvedValue({
-      cursor: 7,
-      keys,
-      total_keys: 20,
-    });
+    mocks.redisScanKeysBatch.mockResolvedValue({ cursor: 7, keys, total_keys: 20 });
     mocks.redisDeleteKeys.mockResolvedValue(keys.length);
     mountBrowser();
     await settle();
@@ -1684,30 +1389,11 @@ describe("RedisKeyBrowser fuzzy key hierarchy", () => {
 
   it("selects hierarchy folders in the normal tree the same way as fuzzy groups", async () => {
     const keys = [
-      {
-        key_display: "course:incr_class_id-1004",
-        key_raw: "Y291cnNlOjEwMDQ=",
-        key_type: "string",
-        ttl: -1,
-      },
-      {
-        key_display: "course:incr_class_id-172",
-        key_raw: "Y291cnNlOjE3Mg==",
-        key_type: "string",
-        ttl: -1,
-      },
-      {
-        key_display: "other:item",
-        key_raw: "b3RoZXI6aXRlbQ==",
-        key_type: "string",
-        ttl: -1,
-      },
+      { key_display: "course:incr_class_id-1004", key_raw: "Y291cnNlOjEwMDQ=", key_type: "string", ttl: -1 },
+      { key_display: "course:incr_class_id-172", key_raw: "Y291cnNlOjE3Mg==", key_type: "string", ttl: -1 },
+      { key_display: "other:item", key_raw: "b3RoZXI6aXRlbQ==", key_type: "string", ttl: -1 },
     ];
-    mocks.redisScanKeysBatch.mockResolvedValue({
-      cursor: 0,
-      keys,
-      total_keys: keys.length,
-    });
+    mocks.redisScanKeysBatch.mockResolvedValue({ cursor: 0, keys, total_keys: keys.length });
     mocks.redisDeleteKeys.mockResolvedValue(2);
     mountBrowser();
     await settle();
@@ -1745,25 +1431,11 @@ describe("RedisKeyBrowser fuzzy key hierarchy", () => {
 
   it("falls back to flat rows at the fuzzy tree limit while retaining loaded-result delete wording", async () => {
     const keys = [
-      {
-        key_display: "user:profile:email",
-        key_raw: "cmF3LWVtYWls",
-        key_type: "string",
-        ttl: -1,
-      },
-      {
-        key_display: "user:profile:name",
-        key_raw: "cmF3LW5hbWU=",
-        key_type: "string",
-        ttl: -1,
-      },
+      { key_display: "user:profile:email", key_raw: "cmF3LWVtYWls", key_type: "string", ttl: -1 },
+      { key_display: "user:profile:name", key_raw: "cmF3LW5hbWU=", key_type: "string", ttl: -1 },
     ];
     mocks.canBuildRedisFuzzyTree.mockReturnValue(false);
-    mocks.redisScanKeysBatch.mockResolvedValue({
-      cursor: 0,
-      keys,
-      total_keys: keys.length,
-    });
+    mocks.redisScanKeysBatch.mockResolvedValue({ cursor: 0, keys, total_keys: keys.length });
     mocks.redisDeleteKeys.mockResolvedValue(1);
     mountBrowser();
     await settle();
@@ -1790,22 +1462,8 @@ describe("RedisKeyBrowser fuzzy key hierarchy", () => {
   });
 
   it("keeps a selected fuzzy group partial when a later SCAN page adds matching keys", async () => {
-    const firstPageKeys = [
-      {
-        key_display: "user:one",
-        key_raw: "dXNlci1vbmU=",
-        key_type: "string",
-        ttl: -1,
-      },
-    ];
-    const laterPageKeys = [
-      {
-        key_display: "user:two",
-        key_raw: "dXNlci10d28=",
-        key_type: "string",
-        ttl: -1,
-      },
-    ];
+    const firstPageKeys = [{ key_display: "user:one", key_raw: "dXNlci1vbmU=", key_type: "string", ttl: -1 }];
+    const laterPageKeys = [{ key_display: "user:two", key_raw: "dXNlci10d28=", key_type: "string", ttl: -1 }];
     mocks.redisScanKeysBatch.mockImplementation((_connectionId: string, _db: number, cursor: number) => Promise.resolve(cursor === 0 ? { cursor: 7, keys: firstPageKeys, total_keys: 2 } : { cursor: 0, keys: laterPageKeys, total_keys: 0 }));
     mocks.redisDeleteKeys.mockResolvedValue(1);
     mountBrowser();
@@ -1839,11 +1497,7 @@ describe("RedisKeyBrowser fuzzy key hierarchy", () => {
       key_type: "string",
       ttl: -1,
     }));
-    mocks.redisScanKeysBatch.mockResolvedValue({
-      cursor: 0,
-      keys,
-      total_keys: keys.length,
-    });
+    mocks.redisScanKeysBatch.mockResolvedValue({ cursor: 0, keys, total_keys: keys.length });
     mocks.redisDeleteKeys.mockImplementation(async (_connectionId: string, _db: number, keyRaws: string[]) => keyRaws.length);
     mountBrowser();
     await settle();
@@ -1872,14 +1526,7 @@ describe("RedisKeyBrowser fuzzy key hierarchy", () => {
       key_type: "string",
       ttl: -1,
     }));
-    const freshKeys = [
-      {
-        key_display: "fresh:remaining",
-        key_raw: "ZnJlc2gtcmVtYWluaW5n",
-        key_type: "string",
-        ttl: -1,
-      },
-    ];
+    const freshKeys = [{ key_display: "fresh:remaining", key_raw: "ZnJlc2gtcmVtYWluaW5n", key_type: "string", ttl: -1 }];
     let returnFreshResults = false;
     mocks.redisScanKeysBatch.mockImplementation(() => Promise.resolve(returnFreshResults ? { cursor: 0, keys: freshKeys, total_keys: 1 } : { cursor: 0, keys, total_keys: keys.length }));
     mocks.redisDeleteKeys.mockResolvedValueOnce(1_000).mockImplementationOnce(async () => {
@@ -1915,14 +1562,7 @@ describe("RedisKeyBrowser fuzzy key hierarchy", () => {
       key_type: "string",
       ttl: -1,
     }));
-    const freshKeys = [
-      {
-        key_display: "fresh:remaining",
-        key_raw: "ZnJlc2gtcmVtYWluaW5n",
-        key_type: "string",
-        ttl: -1,
-      },
-    ];
+    const freshKeys = [{ key_display: "fresh:remaining", key_raw: "ZnJlc2gtcmVtYWluaW5n", key_type: "string", ttl: -1 }];
     const laterDelete = deferred<number>();
     let returnFreshResults = false;
     mocks.redisScanKeysBatch.mockImplementation(() => Promise.resolve(returnFreshResults ? { cursor: 0, keys: freshKeys, total_keys: 1 } : { cursor: 0, keys, total_keys: keys.length }));
@@ -1961,48 +1601,13 @@ describe("RedisKeyBrowser fuzzy key hierarchy", () => {
 
 describe("RedisKeyBrowser interrupted Fetch All", () => {
   it("reloads instead of advancing past an uncommitted buffered page after reactivation", async () => {
-    const bufferedPage = deferred<{
-      cursor: number;
-      keys: Array<{
-        key_display: string;
-        key_raw: string;
-        key_type: string;
-        ttl: number;
-      }>;
-      total_keys: number;
-    }>();
+    const bufferedPage = deferred<{ cursor: number; keys: Array<{ key_display: string; key_raw: string; key_type: string; ttl: number }>; total_keys: number }>();
     let returnFreshPage = false;
     let freshPageRequests = 0;
     mocks.redisScanKeysBatch.mockImplementation((_connectionId: string, _db: number, cursor: number) => {
       if (cursor === 1) return bufferedPage.promise;
       if (returnFreshPage) freshPageRequests++;
-      return Promise.resolve(
-        returnFreshPage
-          ? {
-              cursor: 0,
-              keys: [
-                {
-                  key_display: "fresh:key",
-                  key_raw: "ZnJlc2gta2V5",
-                  key_type: "string",
-                  ttl: -1,
-                },
-              ],
-              total_keys: 2,
-            }
-          : {
-              cursor: 1,
-              keys: [
-                {
-                  key_display: "initial:key",
-                  key_raw: "aW5pdGlhbC1rZXk=",
-                  key_type: "string",
-                  ttl: -1,
-                },
-              ],
-              total_keys: 2,
-            },
-      );
+      return Promise.resolve(returnFreshPage ? { cursor: 0, keys: [{ key_display: "fresh:key", key_raw: "ZnJlc2gta2V5", key_type: "string", ttl: -1 }], total_keys: 2 } : { cursor: 1, keys: [{ key_display: "initial:key", key_raw: "aW5pdGlhbC1rZXk=", key_type: "string", ttl: -1 }], total_keys: 2 });
     });
     const browser = mountKeptAliveBrowser();
     await settle();
@@ -2012,18 +1617,7 @@ describe("RedisKeyBrowser interrupted Fetch All", () => {
 
     await browser.deactivate();
     returnFreshPage = true;
-    bufferedPage.resolve({
-      cursor: 0,
-      keys: [
-        {
-          key_display: "buffered:key",
-          key_raw: "YnVmZmVyZWQta2V5",
-          key_type: "string",
-          ttl: -1,
-        },
-      ],
-      total_keys: 0,
-    });
+    bufferedPage.resolve({ cursor: 0, keys: [{ key_display: "buffered:key", key_raw: "YnVmZmVyZWQta2V5", key_type: "string", ttl: -1 }], total_keys: 0 });
     await settle();
     await browser.activate();
     await settle();
@@ -2035,30 +1629,11 @@ describe("RedisKeyBrowser interrupted Fetch All", () => {
 
   it("selects all loaded keys from the toolbar and clears the multi-selection", async () => {
     const keys = [
-      {
-        key_display: "alpha",
-        key_raw: "YWxwaGE=",
-        key_type: "string",
-        ttl: -1,
-      },
-      {
-        key_display: "bravo",
-        key_raw: "YnJhdm8=",
-        key_type: "string",
-        ttl: -1,
-      },
-      {
-        key_display: "charlie",
-        key_raw: "Y2hhcmxpZQ==",
-        key_type: "string",
-        ttl: -1,
-      },
+      { key_display: "alpha", key_raw: "YWxwaGE=", key_type: "string", ttl: -1 },
+      { key_display: "bravo", key_raw: "YnJhdm8=", key_type: "string", ttl: -1 },
+      { key_display: "charlie", key_raw: "Y2hhcmxpZQ==", key_type: "string", ttl: -1 },
     ];
-    mocks.redisScanKeysBatch.mockResolvedValue({
-      cursor: 0,
-      keys,
-      total_keys: keys.length,
-    });
+    mocks.redisScanKeysBatch.mockResolvedValue({ cursor: 0, keys, total_keys: keys.length });
     mountBrowser();
     await settle();
 
@@ -2082,18 +1657,8 @@ describe("RedisKeyBrowser interrupted Fetch All", () => {
   });
 
   it("fetches remaining scan pages before selecting all keys", async () => {
-    const first = {
-      key_display: "first",
-      key_raw: "Zmlyc3Q=",
-      key_type: "string",
-      ttl: -1,
-    };
-    const second = {
-      key_display: "second",
-      key_raw: "c2Vjb25k",
-      key_type: "string",
-      ttl: -1,
-    };
+    const first = { key_display: "first", key_raw: "Zmlyc3Q=", key_type: "string", ttl: -1 };
+    const second = { key_display: "second", key_raw: "c2Vjb25k", key_type: "string", ttl: -1 };
     mocks.redisScanKeysBatch.mockImplementation((_connectionId: string, _db: number, cursor: number) => {
       if (cursor === 0) return Promise.resolve({ cursor: 1, keys: [first], total_keys: 2 });
       return Promise.resolve({ cursor: 0, keys: [second], total_keys: 0 });
@@ -2104,14 +1669,7 @@ describe("RedisKeyBrowser interrupted Fetch All", () => {
     expect(document.body.textContent).toContain("redis.loadMoreKeys");
     const keyPane = requiredElement<HTMLElement>(".redis-key-pane");
     keyPane.focus();
-    keyPane.dispatchEvent(
-      new KeyboardEvent("keydown", {
-        key: "a",
-        ctrlKey: true,
-        bubbles: true,
-        cancelable: true,
-      }),
-    );
+    keyPane.dispatchEvent(new KeyboardEvent("keydown", { key: "a", ctrlKey: true, bubbles: true, cancelable: true }));
     await vi.waitFor(() => expect(document.querySelector("[data-redis-batch-delete]")?.textContent).toContain("2"));
 
     expect(document.body.textContent).toContain("second");
@@ -2120,23 +1678,9 @@ describe("RedisKeyBrowser interrupted Fetch All", () => {
   });
 
   it("does not select stale keys when a search changes during select-all scanning", async () => {
-    const oldPage = deferred<{
-      cursor: number;
-      keys: RedisKeyInfo[];
-      total_keys: number;
-    }>();
-    const oldKey = {
-      key_display: "old",
-      key_raw: "b2xk",
-      key_type: "string",
-      ttl: -1,
-    };
-    const freshKey = {
-      key_display: "fresh",
-      key_raw: "ZnJlc2g=",
-      key_type: "string",
-      ttl: -1,
-    };
+    const oldPage = deferred<{ cursor: number; keys: RedisKeyInfo[]; total_keys: number }>();
+    const oldKey = { key_display: "old", key_raw: "b2xk", key_type: "string", ttl: -1 };
+    const freshKey = { key_display: "fresh", key_raw: "ZnJlc2g=", key_type: "string", ttl: -1 };
     mocks.redisScanKeysBatch.mockImplementation((_connectionId: string, _db: number, cursor: number, pattern: string) => {
       if (pattern === "*" && cursor === 0) return Promise.resolve({ cursor: 1, keys: [oldKey], total_keys: 2 });
       if (pattern === "*") return oldPage.promise;
@@ -2160,17 +1704,8 @@ describe("RedisKeyBrowser interrupted Fetch All", () => {
   });
 
   it("does not downgrade Ctrl+A to a partial selection when fetch-all is stopped", async () => {
-    const continuation = deferred<{
-      cursor: number;
-      keys: RedisKeyInfo[];
-      total_keys: number;
-    }>();
-    const first = {
-      key_display: "first",
-      key_raw: "Zmlyc3Q=",
-      key_type: "string",
-      ttl: -1,
-    };
+    const continuation = deferred<{ cursor: number; keys: RedisKeyInfo[]; total_keys: number }>();
+    const first = { key_display: "first", key_raw: "Zmlyc3Q=", key_type: "string", ttl: -1 };
     mocks.redisScanKeysBatch.mockImplementation((_connectionId: string, _db: number, cursor: number) => {
       if (cursor === 0) return Promise.resolve({ cursor: 1, keys: [first], total_keys: 2 });
       return continuation.promise;
@@ -2190,24 +1725,10 @@ describe("RedisKeyBrowser interrupted Fetch All", () => {
 
   it("shows a native checked mark after selecting a single leaf key", async () => {
     const keys = [
-      {
-        key_display: "solo-a",
-        key_raw: "c29sby1h",
-        key_type: "string",
-        ttl: -1,
-      },
-      {
-        key_display: "solo-b",
-        key_raw: "c29sby1i",
-        key_type: "string",
-        ttl: -1,
-      },
+      { key_display: "solo-a", key_raw: "c29sby1h", key_type: "string", ttl: -1 },
+      { key_display: "solo-b", key_raw: "c29sby1i", key_type: "string", ttl: -1 },
     ];
-    mocks.redisScanKeysBatch.mockResolvedValue({
-      cursor: 0,
-      keys,
-      total_keys: keys.length,
-    });
+    mocks.redisScanKeysBatch.mockResolvedValue({ cursor: 0, keys, total_keys: keys.length });
     mountBrowser();
     await settle();
 
@@ -2222,24 +1743,10 @@ describe("RedisKeyBrowser interrupted Fetch All", () => {
 
   it("keeps parent and child checkbox DOM state in sync", async () => {
     const keys = [
-      {
-        key_display: "pack:user_select",
-        key_raw: "cGFjazp1c2VyX3NlbGVjdA==",
-        key_type: "string",
-        ttl: -1,
-      },
-      {
-        key_display: "other:item",
-        key_raw: "b3RoZXI6aXRlbQ==",
-        key_type: "string",
-        ttl: -1,
-      },
+      { key_display: "pack:user_select", key_raw: "cGFjazp1c2VyX3NlbGVjdA==", key_type: "string", ttl: -1 },
+      { key_display: "other:item", key_raw: "b3RoZXI6aXRlbQ==", key_type: "string", ttl: -1 },
     ];
-    mocks.redisScanKeysBatch.mockResolvedValue({
-      cursor: 0,
-      keys,
-      total_keys: keys.length,
-    });
+    mocks.redisScanKeysBatch.mockResolvedValue({ cursor: 0, keys, total_keys: keys.length });
     mountBrowser();
     await settle();
 
@@ -2267,11 +1774,7 @@ describe("RedisKeyBrowser interrupted Fetch All", () => {
       { key_display: "k3", key_raw: "azM=", key_type: "string", ttl: -1 },
       { key_display: "k4", key_raw: "azQ=", key_type: "string", ttl: -1 },
     ];
-    mocks.redisScanKeysBatch.mockResolvedValue({
-      cursor: 0,
-      keys,
-      total_keys: keys.length,
-    });
+    mocks.redisScanKeysBatch.mockResolvedValue({ cursor: 0, keys, total_keys: keys.length });
     mountBrowser();
     await settle();
 
@@ -2282,39 +1785,19 @@ describe("RedisKeyBrowser interrupted Fetch All", () => {
     await settle();
     expect(isCheckboxChecked(checkboxes[0]!)).toBe(true);
 
-    checkboxes[2]!.dispatchEvent(
-      new MouseEvent("click", {
-        bubbles: true,
-        cancelable: true,
-        shiftKey: true,
-      }),
-    );
+    checkboxes[2]!.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, shiftKey: true }));
     await settle();
     expect(checkboxes.map((checkbox) => isCheckboxChecked(checkbox as HTMLElement))).toEqual([true, true, true, false]);
     expect(document.querySelector("[data-redis-batch-delete]")?.textContent).toContain("3");
 
     const keyPane = requiredElement<HTMLElement>(".redis-key-pane");
     keyPane.focus();
-    keyPane.dispatchEvent(
-      new KeyboardEvent("keydown", {
-        key: "a",
-        ctrlKey: true,
-        bubbles: true,
-        cancelable: true,
-      }),
-    );
+    keyPane.dispatchEvent(new KeyboardEvent("keydown", { key: "a", ctrlKey: true, bubbles: true, cancelable: true }));
     await settle();
     expect(checkboxes.every((checkbox) => isCheckboxChecked(checkbox as HTMLElement))).toBe(true);
     expect(document.querySelector("[data-redis-batch-delete]")?.textContent).toContain("4");
 
-    keyPane.dispatchEvent(
-      new KeyboardEvent("keydown", {
-        key: "a",
-        metaKey: true,
-        bubbles: true,
-        cancelable: true,
-      }),
-    );
+    keyPane.dispatchEvent(new KeyboardEvent("keydown", { key: "a", metaKey: true, bubbles: true, cancelable: true }));
     await settle();
     expect(checkboxes.every((checkbox) => !isCheckboxChecked(checkbox as HTMLElement))).toBe(true);
   });

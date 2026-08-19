@@ -2057,7 +2057,7 @@ defineExpose({ focusSearch, insertCommand, executeCommand: executeAiCommand });
               <div class="redis-key-toolbar-actions flex items-center justify-end gap-1">
                 <Button v-if="(flatKeys.length > 0 || hasMore) && !allKeysSelected" variant="ghost" size="sm" class="h-6 shrink-0 px-1.5 text-xs" :disabled="selectionBusy" :title="t('redis.selectAllLoadedTitle')" data-redis-select-all @click="selectAllKeys">{{ t("redis.selectAllLoaded") }}</Button>
                 <Button v-if="checkedKeys.size > 0" variant="ghost" size="sm" class="h-6 shrink-0 px-1.5 text-xs" :disabled="selectionBusy" data-redis-deselect-all @click="clearAllCheckedKeys">{{ t("redis.deselectAll") }}</Button>
-                <Button v-if="checkedKeys.size > 0" variant="ghost" size="sm" class="h-6 shrink-0 text-xs text-destructive" :disabled="selectionBusy" data-redis-batch-delete @click="requestBatchDelete"> <Trash2 class="w-3 h-3 mr-1" />{{ checkedKeys.size }} </Button>
+                <Button v-if="checkedKeys.size > 0" variant="ghost" size="sm" class="h-6 shrink-0 text-xs text-destructive" :disabled="selectionBusy" data-redis-batch-delete @click="requestBatchDelete"><Trash2 class="w-3 h-3 mr-1" />{{ checkedKeys.size }}</Button>
                 <Button variant="ghost" size="icon" class="h-6 w-6 shrink-0" :disabled="deletingKeys" @click="loadKeys">
                   <Loader2 v-if="loading" class="h-3 w-3 animate-spin" />
                   <RefreshCw v-else class="h-3 w-3" />

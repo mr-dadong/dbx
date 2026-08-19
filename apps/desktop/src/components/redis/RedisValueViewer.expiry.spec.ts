@@ -90,10 +90,7 @@ function stringValue(rawBase64 = "dmFsdWU=", ttl = 60) {
     key_raw: "key",
     ttl,
     redis_type: "string",
-    data: {
-      kind: "string" as const,
-      content: { raw_base64: rawBase64, encoding: "utf8" as const },
-    },
+    data: { kind: "string" as const, content: { raw_base64: rawBase64, encoding: "utf8" as const } },
   };
 }
 
@@ -106,14 +103,8 @@ function listValue(ttl = 60) {
     data: {
       kind: "list" as const,
       items: [
-        {
-          index: 0,
-          value: { raw_base64: "Zmlyc3Q=", encoding: "utf8" as const },
-        },
-        {
-          index: 1,
-          value: { raw_base64: "c2Vjb25k", encoding: "utf8" as const },
-        },
+        { index: 0, value: { raw_base64: "Zmlyc3Q=", encoding: "utf8" as const } },
+        { index: 1, value: { raw_base64: "c2Vjb25k", encoding: "utf8" as const } },
       ],
       total: 2,
       scan_cursor: undefined,
@@ -139,7 +130,6 @@ function deferred<T>() {
   return { promise, resolve };
 }
 
-// TTL 徽章按人类可读单位格式化，这里配置英文单位文案，便于断言倒计时数值
 const testI18nMessages = {
   en: {
     redis: {
@@ -169,15 +159,7 @@ function mountViewer(onDeleted: (keyRaw: string) => void, onLoaded = vi.fn()) {
       },
     }),
   );
-  app.use(
-    createI18n({
-      legacy: false,
-      locale: "en",
-      messages: testI18nMessages,
-      missingWarn: false,
-      fallbackWarn: false,
-    }),
-  );
+  app.use(createI18n({ legacy: false, locale: "en", messages: testI18nMessages, missingWarn: false, fallbackWarn: false }));
   app.mount(host);
   mountedApps.push({ unmount: () => app.unmount(), host });
 }
@@ -207,15 +189,7 @@ function mountKeepAliveViewer(onDeleted = vi.fn()) {
       },
     }),
   );
-  app.use(
-    createI18n({
-      legacy: false,
-      locale: "en",
-      messages: testI18nMessages,
-      missingWarn: false,
-      fallbackWarn: false,
-    }),
-  );
+  app.use(createI18n({ legacy: false, locale: "en", messages: testI18nMessages, missingWarn: false, fallbackWarn: false }));
   app.mount(host);
   mountedApps.push({ unmount: () => app.unmount(), host });
   return {
@@ -243,25 +217,13 @@ async function saveOpenTtlEditor() {
 
 async function selectExpiryMode(mode: "none" | "at") {
   const trigger = document.querySelector<HTMLButtonElement>("[data-slot='select-trigger'][aria-label='redis.expiry']")!;
-  trigger.dispatchEvent(
-    new KeyboardEvent("keydown", {
-      key: "ArrowDown",
-      bubbles: true,
-      cancelable: true,
-    }),
-  );
+  trigger.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true, cancelable: true }));
   await settle();
 
   const index = mode === "none" ? 0 : 2;
   const option = document.querySelectorAll<HTMLElement>("[data-redis-expiry-mode-content] [role='option']")[index]!;
   option.focus();
-  option.dispatchEvent(
-    new KeyboardEvent("keydown", {
-      key: "Enter",
-      bubbles: true,
-      cancelable: true,
-    }),
-  );
+  option.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true, cancelable: true }));
   await settle();
 }
 
