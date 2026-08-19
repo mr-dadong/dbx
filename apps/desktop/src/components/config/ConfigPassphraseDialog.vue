@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
+import { computed, nextTick, onMounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { Lock } from "@lucide/vue";
 import { Button } from "@/components/ui/button";
@@ -27,6 +27,17 @@ const dialogOpen = computed({
 
 const passphrase = ref("");
 const error = ref("");
+// 密码输入框组件引用，用于打开对话框时手动聚焦
+const passphraseInput = ref<InstanceType<typeof PasswordInput> | null>(null);
+
+// 打开对话框时手动聚焦输入框，并把光标定位到末尾（不选中已回显的内容，避免误输入时覆盖已保存的密码）
+onMounted(async () => {
+  await nextTick();
+  const inputEl = passphraseInput.value?.$el?.querySelector("input");
+  inputEl?.focus();
+  const length = String(inputEl?.value ?? "").length;
+  inputEl?.setSelectionRange(length, length);
+});
 
 watch(
   dialogOpen,
@@ -57,7 +68,8 @@ const displayError = computed(() => error.value || props.externalError || "");
 
 <template>
   <Dialog v-model:open="dialogOpen">
-    <DialogContent class="sm:max-w-[440px]">
+    <!-- initial-focus=false：禁用默认自动聚焦（自动聚焦会选中已回显的密码），改由 onMounted 手动聚焦且不选中 -->
+    <DialogContent class="sm:max-w-[440px]" :initial-focus="false">
       <DialogHeader>
         <DialogTitle class="flex items-center gap-2">
           <Lock class="h-5 w-5" />
@@ -72,7 +84,7 @@ const displayError = computed(() => error.value || props.externalError || "");
 
         <div class="grid gap-2">
           <Label>{{ t("configExport.passphrase") }}</Label>
-          <PasswordInput v-model="passphrase" :placeholder="t('configExport.passphrasePlaceholder')" :toggle-tab-index="-1" @keydown.enter="confirm" />
+          <PasswordInput ref="passphraseInput" v-model="passphrase" :placeholder="t('configExport.passphrasePlaceholder')" :toggle-tab-index="-1" @keydown.enter="confirm" />
         </div>
 
         <p v-if="displayError" class="text-sm text-destructive">{{ displayError }}</p>
