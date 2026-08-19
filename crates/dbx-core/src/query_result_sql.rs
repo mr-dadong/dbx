@@ -525,11 +525,11 @@ fn add_sql_server_offset_fetch(statement: &str, limit: usize, offset: usize) -> 
 
     let order_by_index = find_top_level_trailing_order_by(statement);
     if order_by_index.is_none() && has_top_level_select_distinct(statement) {
-        return (offset == 0).then(|| add_sql_server_top(statement, limit));
+        return (offset == 0).then(|| inject_sql_server_top(statement, limit));
     }
 
     if offset == 0 {
-        return Some(add_sql_server_top(statement, limit));
+        return Some(inject_sql_server_top(statement, limit));
     }
 
     let statement_without_order = order_by_index.map(|index| statement[..index].trim_end()).unwrap_or(statement);
@@ -1223,13 +1223,9 @@ fn derived_projection_name(item: &SelectItem) -> Option<&str> {
     }
 }
 
-fn add_sql_server_top(sql: &str, limit: usize) -> String {
-    // 与 add_sql_server_offset_fetch 保持一致的双重检测：已有 TOP 或 OFFSET/FETCH
-    // （含只有 OFFSET 没有 FETCH NEXT 的合法写法）时都不能再插入 TOP。
-    if has_top_level_select_top(sql) || has_top_level_offset_fetch_next(sql) || sql_server_ast_has_offset_or_fetch(sql)
-    {
-        return sql.to_string();
-    }
+/// Inserts TOP after add_sql_server_offset_fetch has ruled out an existing
+/// TOP or OFFSET/FETCH clause, avoiding a second AST parse on the first page.
+fn inject_sql_server_top(sql: &str, limit: usize) -> String {
     if sql.len() >= 6 && sql[..6].eq_ignore_ascii_case("SELECT") {
         let rest = &sql[6..];
         if let Some((leading, after_modifier)) = strip_sql_server_select_modifier(rest, "DISTINCT") {
@@ -3083,16 +3079,24 @@ WHERE u.id = picked.id;
     }
 
     #[test]
-    fn keeps_sqlserver_offset_fetch_next_when_offset_is_zero() {
-        let result = build_paginated_query_sql(PaginatedQuerySqlOptions {
-            original_sql: "SELECT * FROM TABLE_NAME ORDER BY id OFFSET 1 ROWS FETCH NEXT 10 ROWS ONLY".to_string(),
-            database_type: Some(DatabaseType::SqlServer),
-            limit: 100,
-            offset: 0,
-        });
+    fn sqlserver_first_page_preserves_existing_pagination_or_injects_top() {
+        for (original_sql, expected_sql) in [
+            (
+                "SELECT * FROM TABLE_NAME ORDER BY id OFFSET 1 ROWS FETCH NEXT 10 ROWS ONLY",
+                "SELECT * FROM TABLE_NAME ORDER BY id OFFSET 1 ROWS FETCH NEXT 10 ROWS ONLY",
+            ),
+            ("SELECT id FROM TABLE_NAME", "SELECT TOP (100) id FROM TABLE_NAME"),
+        ] {
+            let result = build_paginated_query_sql(PaginatedQuerySqlOptions {
+                original_sql: original_sql.to_string(),
+                database_type: Some(DatabaseType::SqlServer),
+                limit: 100,
+                offset: 0,
+            });
 
-        assert!(result.ok);
-        assert_eq!(result.sql.unwrap(), "SELECT * FROM TABLE_NAME ORDER BY id OFFSET 1 ROWS FETCH NEXT 10 ROWS ONLY");
+            assert!(result.ok, "{original_sql}");
+            assert_eq!(result.sql.as_deref(), Some(expected_sql), "{original_sql}");
+        }
     }
 
     // 临时表 #tmp 会让词法扫描器把同一行后面的 OFFSET/FETCH 当成注释丢掉，
