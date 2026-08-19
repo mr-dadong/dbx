@@ -14,7 +14,8 @@ const connectionStore = {
   connectingIds: new Set<string>(),
   connectionErrors: {},
   connectionMultiSelectActive: false,
-  connections: [],
+  connections: [] as { id: string }[],
+  expandConnectionGroups: vi.fn(),
   getConfig: () => ({ id: "connection-1", db_type: "sqlserver" }),
   getSidebarVisibleFilterSummary: () => null,
   clearConnectionError: vi.fn(),
@@ -103,6 +104,10 @@ afterEach(() => {
   connectionStore.selectedTreeNodeIds = [];
   connectionStore.selectedTreeNodeIdsSet = new Set<string>();
   connectionStore.connectionMultiSelectActive = false;
+  // 重置测试中修改的连接列表，避免残留数据影响后续用例的选择过滤
+  connectionStore.connections = [];
+  // 清空分组展开的调用记录，避免上一个用例的调用历史污染断言
+  connectionStore.expandConnectionGroups.mockClear();
   connectionStore.sidebarLayout = { groups: [], order: [] };
   connectionStore.treeNodes = [];
   connectionStore.treeSelectionAnchorId = null;
@@ -111,7 +116,43 @@ afterEach(() => {
 });
 
 describe("TreeItem load-more activation", () => {
-  it("toggles a connection group through its row checkbox", async () => {
+  it("cascades a connection group checkbox to its connections", async () => {
+    const group: TreeNode = {
+      id: "group-1",
+      label: "Group 1",
+      type: "connection-group",
+      children: [],
+    };
+    connectionStore.treeNodes = [group];
+    // 分组下挂一个连接，勾选框会级联选中该连接
+    connectionStore.sidebarLayout = {
+      groups: [{ id: group.id, name: group.label, collapsed: false }],
+      order: [{ type: "group", id: group.id, children: [{ type: "connection", id: "connection-2" }] }],
+    };
+    connectionStore.connections = [{ id: "connection-2" }];
+    const { row } = await mountTreeItem(group);
+    const toggle = row.querySelector<HTMLButtonElement>('[data-sidebar-group-selection-toggle="true"]');
+    expect(toggle).not.toBeNull();
+
+    toggle?.click();
+
+    // 勾选后级联选中分组下的连接，并自动展开该分组
+    expect(connectionStore.selectedTreeNodeIds).toEqual(["connection-2"]);
+    expect(connectionStore.selectedTreeNodeId).toBe("connection-2");
+    expect(connectionStore.treeSelectionAnchorId).toBe("connection-2");
+    expect(connectionStore.connectionMultiSelectActive).toBe(true);
+    expect(connectionStore.expandConnectionGroups).toHaveBeenCalledWith([group.id]);
+
+    toggle?.click();
+
+    // 再次点击取消勾选分组下的全部连接
+    expect(connectionStore.selectedTreeNodeIds).toEqual([]);
+    expect(connectionStore.selectedTreeNodeId).toBeNull();
+    expect(connectionStore.treeSelectionAnchorId).toBeNull();
+    expect(connectionStore.connectionMultiSelectActive).toBe(false);
+  });
+
+  it("ignores the checkbox of an empty connection group", async () => {
     const group: TreeNode = {
       id: "group-1",
       label: "Group 1",
@@ -129,17 +170,10 @@ describe("TreeItem load-more activation", () => {
 
     toggle?.click();
 
-    expect(connectionStore.selectedTreeNodeIds).toEqual([group.id]);
-    expect(connectionStore.selectedTreeNodeId).toBe(group.id);
-    expect(connectionStore.treeSelectionAnchorId).toBe(group.id);
-    expect(connectionStore.connectionMultiSelectActive).toBe(true);
-
-    toggle?.click();
-
+    // 空分组没有可级联的连接，点击不产生任何选择变化
     expect(connectionStore.selectedTreeNodeIds).toEqual([]);
-    expect(connectionStore.selectedTreeNodeId).toBeNull();
-    expect(connectionStore.treeSelectionAnchorId).toBeNull();
     expect(connectionStore.connectionMultiSelectActive).toBe(false);
+    expect(connectionStore.expandConnectionGroups).not.toHaveBeenCalled();
   });
 
   it("runs load-more on a single click in double-click activation mode", async () => {
