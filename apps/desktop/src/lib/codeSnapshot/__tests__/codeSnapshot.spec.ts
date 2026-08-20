@@ -32,6 +32,9 @@ describe("renderCodeSnapshotHtml", () => {
     expect(html).toContain('class="dbx-code-snapshot"');
     expect(html).toContain('data-snapshot-appearance="dark"');
     expect(html).toContain('class="dbx-code-snapshot__pre dbx-code-snapshot__pre--numbered"');
+    expect(html).toContain(".dbx-code-snapshot *");
+    expect(html).toContain("border: 0");
+    expect(html).toContain("outline: 0");
   });
 
   it("renders macOS traffic lights and an optional title by default", async () => {
@@ -93,20 +96,24 @@ describe("renderCodeSnapshotHtml", () => {
     toPng.mockResolvedValue("data:image/png;base64,test");
     vi.stubGlobal("window", { devicePixelRatio: 3 });
     try {
-      await snapshotElementToPng({ offsetWidth: 320, offsetHeight: 160 } as HTMLElement);
+      await snapshotElementToPng({ offsetWidth: 320, offsetHeight: 160, scrollWidth: 640, scrollHeight: 240 } as HTMLElement);
 
       expect(toPng).toHaveBeenLastCalledWith(
         expect.anything(),
         expect.objectContaining({
-          width: 320,
-          height: 160,
-          pixelRatio: 2,
+          width: 640,
+          height: 240,
+          scale: 2,
+          style: {
+            width: "640px",
+            height: "240px",
+          },
         }),
       );
 
       vi.stubGlobal("window", { devicePixelRatio: 0 });
-      await snapshotElementToPng({ offsetWidth: 320, offsetHeight: 160 } as HTMLElement);
-      expect(toPng).toHaveBeenLastCalledWith(expect.anything(), expect.objectContaining({ pixelRatio: 1 }));
+      await snapshotElementToPng({ offsetWidth: 320, offsetHeight: 160, scrollWidth: 320, scrollHeight: 160 } as HTMLElement);
+      expect(toPng).toHaveBeenLastCalledWith(expect.anything(), expect.objectContaining({ scale: 1 }));
     } finally {
       vi.unstubAllGlobals();
     }
