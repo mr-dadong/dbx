@@ -1,5 +1,5 @@
 import { createPinia, setActivePinia } from "pinia";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { TreeNode } from "@/types/database";
 
 function installLocalStorage() {
@@ -17,6 +17,15 @@ describe("connection root lookup", () => {
     vi.unstubAllGlobals();
     installLocalStorage();
     setActivePinia(createPinia());
+  });
+
+  afterEach(async () => {
+    // markConnectionLost 内部会 fire-and-forget 地动态 import queryStore（产品代码
+    // 刻意如此，用于打破 connectionStore 与 queryStore 的循环依赖）。若不等这个
+    // 导入完成就结束测试，CI 高负载下模块加载可能拖到环境销毁之后，产生
+    // EnvironmentTeardownError 的 unhandled rejection 并使整个测试进程以退出码 1
+    // 失败。这里显式等待所有在途动态导入 settle 后再交还控制权。
+    await vi.dynamicImportSettled();
   });
 
   it("finds a connection nested inside connection groups", async () => {
