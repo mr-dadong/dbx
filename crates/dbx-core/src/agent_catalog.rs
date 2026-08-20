@@ -254,6 +254,13 @@ const AGENT_CATALOG: &[AgentCatalogEntry] = &[
         profiles: &[],
     },
     AgentCatalogEntry {
+        db_type: DatabaseType::Spanner,
+        key: "spanner",
+        label: "Google Cloud Spanner",
+        store_visible: true,
+        profiles: &[],
+    },
+    AgentCatalogEntry {
         db_type: DatabaseType::Kylin,
         key: "kylin",
         label: "Apache Kylin",
@@ -264,6 +271,13 @@ const AGENT_CATALOG: &[AgentCatalogEntry] = &[
         db_type: DatabaseType::Ignite,
         key: "ignite",
         label: "Apache Ignite",
+        store_visible: true,
+        profiles: &[],
+    },
+    AgentCatalogEntry {
+        db_type: DatabaseType::Ignite3,
+        key: "ignite3",
+        label: "Apache Ignite 3",
         store_visible: true,
         profiles: &[],
     },
