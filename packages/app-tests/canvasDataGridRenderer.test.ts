@@ -52,11 +52,25 @@ test("DataGrid forwards hover action reservation only for right-aligned canvas c
 });
 
 test("canvas row fill keeps frozen and scrolling regions on the same selection surface", () => {
-  const theme = { cellActive: "active-blue", cellSelected: "selected-blue" };
+  const theme = { cellActive: "active-blue", rowSelected: "row-selected-blue" };
 
   assert.equal(resolveCanvasDataGridRowFill(theme, "base", { isActive: true, isDeleted: false, isSelected: false }), "active-blue");
-  assert.equal(resolveCanvasDataGridRowFill(theme, "base", { isActive: true, isDeleted: false, isSelected: true }), "selected-blue");
+  assert.equal(resolveCanvasDataGridRowFill(theme, "base", { isActive: true, isDeleted: false, isSelected: true }), "row-selected-blue");
   assert.equal(resolveCanvasDataGridRowFill(theme, "deleted", { isActive: true, isDeleted: true, isSelected: false }), "deleted");
+});
+
+test("paint theme exposes a dedicated deep row-selected token apart from the pale selection overlay", () => {
+  const getVar = () => "";
+
+  const light = resolveDataGridPaintTheme({ getVar, isDark: false });
+  const dark = resolveDataGridPaintTheme({ getVar, isDark: true });
+
+  assert.equal(light.rowSelected, "rgb(147, 197, 253)");
+  assert.equal(light.rowSelectedDirty, "rgb(216, 213, 158)");
+  assert.equal(light.rowNumberSelected, "rgb(147, 197, 253)");
+  assert.equal(dark.rowSelected, "rgb(37, 78, 116)");
+  assert.equal(dark.rowSelectedDirty, "rgb(92, 88, 50)");
+  assert.equal(dark.rowNumberSelected, "rgb(37, 78, 116)");
 });
 
 test("data grid paint themes use the increased striped row contrast", () => {
