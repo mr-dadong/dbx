@@ -259,7 +259,16 @@ pub fn build_paginated_query_sql(options: PaginatedQuerySqlOptions) -> QuerySqlB
             if options.database_type == Some(DatabaseType::Kingbase) && has_top_level_top(&statement) {
                 return err("unsupported");
             }
-            let dedup_count = dedup_projection_count_without_order_by(&options.original_sql);
+            // 只有分布式 OLAP 数据库（Doris、StarRocks）才注入位置式 ORDER BY：
+            // 它们的 tablet 扫描顺序在不同查询执行之间会变化，DISTINCT/GROUP BY
+            // 查询若不带排序直接用 LIMIT/OFFSET 分页，跨页会出现重复或遗漏行。
+            // 单机数据库（MySQL、PostgreSQL 等）没有这个问题，注入反而会悄悄
+            // 改变用户 SQL 的执行语义，还可能带来额外排序开销，因此保持原样。
+            let dedup_count = if matches!(options.database_type, Some(DatabaseType::Doris | DatabaseType::StarRocks)) {
+                dedup_projection_count_without_order_by(&options.original_sql)
+            } else {
+                None
+            };
             ok(add_standard_limit(&statement, options.database_type, safe_limit, safe_offset, dedup_count))
         }
     }
@@ -1733,9 +1742,10 @@ fn line_has_open_line_comment(line: &str) -> bool {
 
 /// For dedup queries (DISTINCT / GROUP BY) without an ORDER BY clause, generate
 /// a positional `ORDER BY 1, 2, ..., N` clause so that LIMIT/OFFSET pagination
-/// returns deterministic results across pages.  This is especially important for
-/// distributed databases (e.g. Doris, StarRocks) where tablet scan order varies
-/// between independent query executions.
+/// returns deterministic results across pages.  Only used for distributed
+/// OLAP databases (Doris, StarRocks) where tablet scan order varies between
+/// independent query executions; single-node databases keep the user's SQL
+/// untouched to avoid silently changing its semantics.
 fn format_positional_order_by(column_count: usize) -> String {
     if column_count == 0 {
         return String::new();
@@ -4344,7 +4354,7 @@ WHERE u.id = picked.id;
     }
 
     #[test]
-    fn mysql_distinct_query_first_page_gets_order_by() {
+    fn mysql_distinct_query_keeps_user_sql_without_order_by() {
         let result = build_paginated_query_sql(PaginatedQuerySqlOptions {
             original_sql: "SELECT DISTINCT city FROM users".to_string(),
             database_type: Some(DatabaseType::Mysql),
@@ -4353,14 +4363,43 @@ WHERE u.id = picked.id;
         });
 
         assert!(result.ok);
-        assert_eq!(result.sql.unwrap(), "SELECT DISTINCT city FROM users ORDER BY 1 LIMIT 200;");
+        // MySQL 是单机数据库，分页顺序稳定，不注入位置式 ORDER BY。
+        assert_eq!(result.sql.unwrap(), "SELECT DISTINCT city FROM users LIMIT 200;");
     }
 
     #[test]
-    fn postgres_distinct_query_first_page_gets_order_by() {
+    fn mysql_group_by_query_keeps_user_sql_without_order_by() {
+        // 对应实际用户反馈：GROUP BY 查询不应被自动追加 ORDER BY 1, 2。
+        let result = build_paginated_query_sql(PaginatedQuerySqlOptions {
+            original_sql: "SELECT a, b FROM data.logdetails GROUP BY a, b".to_string(),
+            database_type: Some(DatabaseType::Mysql),
+            limit: 100,
+            offset: 0,
+        });
+
+        assert!(result.ok);
+        assert_eq!(result.sql.unwrap(), "SELECT a, b FROM data.logdetails GROUP BY a, b LIMIT 100;");
+    }
+
+    #[test]
+    fn postgres_distinct_query_keeps_user_sql_without_order_by() {
         let result = build_paginated_query_sql(PaginatedQuerySqlOptions {
             original_sql: "SELECT DISTINCT city, name FROM users".to_string(),
             database_type: Some(DatabaseType::Postgres),
+            limit: 100,
+            offset: 0,
+        });
+
+        assert!(result.ok);
+        assert_eq!(result.sql.unwrap(), "SELECT DISTINCT city, name FROM users LIMIT 100;");
+    }
+
+    #[test]
+    fn starrocks_distinct_query_first_page_gets_order_by() {
+        // StarRocks 与 Doris 同为分布式 OLAP，保留注入以避免跨页重复行。
+        let result = build_paginated_query_sql(PaginatedQuerySqlOptions {
+            original_sql: "SELECT DISTINCT city, name FROM users".to_string(),
+            database_type: Some(DatabaseType::StarRocks),
             limit: 100,
             offset: 0,
         });
