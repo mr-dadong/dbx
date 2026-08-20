@@ -6007,11 +6007,15 @@ function dataGridRowStyle(item: RowItem): CSSProperties {
     "--data-grid-cell-bg": rowBg,
     "--data-grid-row-number-bg": rowNumberBg,
     "--data-grid-cell-selected-bg": dark ? "rgb(20, 40, 60)" : "rgb(239, 246, 255)",
+    // 整行选中背景：比"选区覆盖淡色指示"更深，点击行号选中整行时醒目显示
+    "--data-grid-row-selected-bg": dark ? "rgb(37, 78, 116)" : "rgb(147, 197, 253)",
     "--data-grid-cell-selected-single-bg": dark ? "rgb(30, 64, 96)" : "rgb(191, 219, 254)",
     "--data-grid-cell-selected-dirty-bg": dark ? "rgb(76, 66, 38)" : "rgb(235, 224, 184)",
+    // 整行选中行内的脏单元格背景：跟随整行选中色同步加深的黄褐变体
+    "--data-grid-row-selected-dirty-bg": dark ? "rgb(92, 88, 50)" : "rgb(216, 213, 158)",
     "--data-grid-cell-selected-border": dark ? "rgb(96, 165, 250)" : "rgb(59, 130, 246)",
     "--data-grid-row-number-active-bg": activeRowBg,
-    "--data-grid-row-number-selected-bg": dark ? "rgb(30, 64, 96)" : "rgb(191, 219, 254)",
+    "--data-grid-row-number-selected-bg": dark ? "rgb(37, 78, 116)" : "rgb(147, 197, 253)",
   } as CSSProperties;
 }
 
@@ -11300,7 +11304,7 @@ function currentGridContextMenuItems(): ContextMenuItem[] {
                                     <SelectItem value="json-path">{{ t("grid.formatterJsonPath") }}</SelectItem>
                                     <SelectItem value="mask">{{ t("grid.formatterMask") }}</SelectItem>
                                     <SelectItem v-if="formatterForeignKeyForColumn(col.actualColIdx)" value="foreign-key-display">{{ t("grid.formatterForeignKeyDisplay") }}</SelectItem>
-                                    <SelectItem value="custom-template">{{ t("grid.formatterCustomTemplate") }}</SelectItem>
+                                    <SelectItem value="custom-template">{{ t("grid.formatterCustomTemplate") }} </SelectItem>
                                   </SelectContent>
                                 </Select>
                               </div>
@@ -11317,7 +11321,7 @@ function currentGridContextMenuItems(): ContextMenuItem[] {
                                     <SelectContent>
                                       <SelectItem value="auto">{{ t("grid.formatterUnitAuto") }}</SelectItem>
                                       <SelectItem value="seconds">{{ t("grid.formatterUnitSeconds") }}</SelectItem>
-                                      <SelectItem value="milliseconds">{{ t("grid.formatterUnitMilliseconds") }}</SelectItem>
+                                      <SelectItem value="milliseconds">{{ t("grid.formatterUnitMilliseconds") }} </SelectItem>
                                     </SelectContent>
                                   </Select>
                                 </div>
@@ -11414,7 +11418,7 @@ function currentGridContextMenuItems(): ContextMenuItem[] {
                                       <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent>
-                                      <SelectItem :value="CUSTOM_FORMATTER_NEW">{{ t("grid.formatterNewCustom") }}</SelectItem>
+                                      <SelectItem :value="CUSTOM_FORMATTER_NEW">{{ t("grid.formatterNewCustom") }} </SelectItem>
                                       <SelectItem v-for="formatter in savedCustomFormatters" :key="formatter.id" :value="formatter.id">
                                         {{ formatter.name }}
                                       </SelectItem>
@@ -12341,13 +12345,13 @@ function currentGridContextMenuItems(): ContextMenuItem[] {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="start" class="w-44">
-                      <DropdownMenuItem @click="applyGeneratedDetailValue('empty')">{{ t("grid.generateEmptyString") }}</DropdownMenuItem>
-                      <DropdownMenuItem @click="applyGeneratedDetailValue('null')">{{ t("grid.generateNull") }}</DropdownMenuItem>
-                      <DropdownMenuItem @click="applyGeneratedDetailValue('datetime')">{{ t("grid.generateCurrentDatetime") }}</DropdownMenuItem>
-                      <DropdownMenuItem @click="applyGeneratedDetailValue('date')">{{ t("grid.generateCurrentDate") }}</DropdownMenuItem>
-                      <DropdownMenuItem @click="applyGeneratedDetailValue('uuid')">{{ t("grid.generateUuid") }}</DropdownMenuItem>
-                      <DropdownMenuItem @click="applyGeneratedDetailValue('snowflake')">{{ t("grid.generateSnowflakeId") }}</DropdownMenuItem>
-                      <DropdownMenuItem @click="openGenerateIncrementDialog('detail')">{{ t("grid.generateIncrementId") }}</DropdownMenuItem>
+                      <DropdownMenuItem @click="applyGeneratedDetailValue('empty')">{{ t("grid.generateEmptyString") }} </DropdownMenuItem>
+                      <DropdownMenuItem @click="applyGeneratedDetailValue('null')">{{ t("grid.generateNull") }} </DropdownMenuItem>
+                      <DropdownMenuItem @click="applyGeneratedDetailValue('datetime')">{{ t("grid.generateCurrentDatetime") }} </DropdownMenuItem>
+                      <DropdownMenuItem @click="applyGeneratedDetailValue('date')">{{ t("grid.generateCurrentDate") }} </DropdownMenuItem>
+                      <DropdownMenuItem @click="applyGeneratedDetailValue('uuid')">{{ t("grid.generateUuid") }} </DropdownMenuItem>
+                      <DropdownMenuItem @click="applyGeneratedDetailValue('snowflake')">{{ t("grid.generateSnowflakeId") }} </DropdownMenuItem>
+                      <DropdownMenuItem @click="openGenerateIncrementDialog('detail')">{{ t("grid.generateIncrementId") }} </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                   <Button v-if="activeValueEditorActions.includes('formatJson')" variant="outline" size="sm" class="h-6 text-xs" @mousedown.prevent @click="formatValueEditorJson">
@@ -12570,8 +12574,12 @@ function currentGridContextMenuItems(): ContextMenuItem[] {
   --data-grid-cell-active-bg: rgb(244, 248, 255);
   --data-grid-cell-dirty-bg: rgb(255, 248, 230);
   --data-grid-cell-selected-bg: rgb(239, 246, 255);
+  /* 整行选中背景：比"选区覆盖淡色指示"更深，点击行号选中整行时醒目显示 */
+  --data-grid-row-selected-bg: rgb(147, 197, 253);
   --data-grid-cell-selected-single-bg: rgb(191, 219, 254);
   --data-grid-cell-selected-dirty-bg: rgb(235, 224, 184);
+  /* 整行选中行内的脏单元格背景：跟随整行选中色同步加深的黄褐变体 */
+  --data-grid-row-selected-dirty-bg: rgb(216, 213, 158);
   --data-grid-cell-selected-border: rgb(59, 130, 246);
   --data-grid-cell-hover-bg: rgb(245, 245, 245);
   --data-grid-cell-search-bg: rgb(253, 245, 184);
@@ -12582,7 +12590,7 @@ function currentGridContextMenuItems(): ContextMenuItem[] {
   --data-grid-row-number-edited-bg: rgb(253, 241, 219);
   --data-grid-row-number-deleted-bg: rgb(255, 244, 244);
   --data-grid-row-number-active-bg: rgb(244, 248, 255);
-  --data-grid-row-number-selected-bg: rgb(191, 219, 254);
+  --data-grid-row-number-selected-bg: rgb(147, 197, 253);
   --data-grid-scrollbar-thumb: color-mix(in oklch, var(--foreground) 30%, transparent);
   --data-grid-scrollbar-thumb-hover: color-mix(in oklch, var(--foreground) 48%, transparent);
   --data-grid-scrollbar-track: transparent;
@@ -12592,6 +12600,7 @@ function currentGridContextMenuItems(): ContextMenuItem[] {
 [data-grid-root].data-grid--has-save-error {
   --data-grid-cell-dirty-bg: rgb(250, 212, 216) !important;
   --data-grid-cell-selected-dirty-bg: rgb(240, 192, 198) !important;
+  --data-grid-row-selected-dirty-bg: rgb(240, 192, 198) !important;
 }
 
 [data-grid-root].data-grid--dark,
@@ -12602,8 +12611,10 @@ function currentGridContextMenuItems(): ContextMenuItem[] {
   --data-grid-cell-active-bg: rgb(25, 34, 46);
   --data-grid-cell-dirty-bg: rgb(94, 75, 26);
   --data-grid-cell-selected-bg: rgb(20, 40, 60);
+  --data-grid-row-selected-bg: rgb(37, 78, 116);
   --data-grid-cell-selected-single-bg: rgb(30, 64, 96);
   --data-grid-cell-selected-dirty-bg: rgb(76, 66, 38);
+  --data-grid-row-selected-dirty-bg: rgb(92, 88, 50);
   --data-grid-cell-selected-border: rgb(96, 165, 250);
   --data-grid-cell-hover-bg: rgb(46, 47, 51);
   --data-grid-cell-search-bg: rgb(72, 57, 8);
@@ -12614,7 +12625,7 @@ function currentGridContextMenuItems(): ContextMenuItem[] {
   --data-grid-row-number-edited-bg: rgb(48, 41, 28);
   --data-grid-row-number-deleted-bg: rgb(55, 31, 32);
   --data-grid-row-number-active-bg: rgb(25, 34, 46);
-  --data-grid-row-number-selected-bg: rgb(30, 64, 96);
+  --data-grid-row-number-selected-bg: rgb(37, 78, 116);
   --data-grid-scrollbar-thumb: rgb(82, 82, 91);
   --data-grid-scrollbar-thumb-hover: rgb(113, 113, 122);
   --data-grid-scrollbar-track: rgb(24, 24, 27);
@@ -12625,6 +12636,7 @@ function currentGridContextMenuItems(): ContextMenuItem[] {
 :global(.dark) [data-grid-root].data-grid--has-save-error {
   --data-grid-cell-dirty-bg: rgb(94, 56, 57) !important;
   --data-grid-cell-selected-dirty-bg: rgb(114, 66, 67) !important;
+  --data-grid-row-selected-dirty-bg: rgb(114, 66, 67) !important;
 }
 
 @supports (background: color-mix(in oklab, white 50%, transparent)) {
@@ -12634,23 +12646,29 @@ function currentGridContextMenuItems(): ContextMenuItem[] {
     --data-grid-row-deleted-bg: color-mix(in oklab, var(--destructive) 5%, transparent);
     --data-grid-cell-dirty-bg: color-mix(in oklab, rgb(240 177 0) 10%, transparent);
     --data-grid-cell-selected-bg: color-mix(in oklab, rgb(59 130 246) 12%, var(--background));
+    --data-grid-row-selected-bg: color-mix(in oklab, rgb(59 130 246) 45%, var(--background));
     --data-grid-cell-selected-single-bg: color-mix(in oklab, rgb(59 130 246) 30%, var(--background));
     --data-grid-cell-selected-dirty-bg: color-mix(in oklab, rgb(234 181 50) 30%, color-mix(in oklab, rgb(59 130 246) 18%, var(--background)));
+    --data-grid-row-selected-dirty-bg: color-mix(in oklab, rgb(234 181 50) 30%, var(--data-grid-row-selected-bg));
     --data-grid-cell-selected-border: color-mix(in oklab, rgb(59 130 246) 75%, transparent);
     --data-grid-cell-hover-bg: color-mix(in oklab, var(--accent) 50%, transparent);
     --data-grid-row-number-new-bg: color-mix(in oklab, rgb(16 185 129) 15%, var(--background));
     --data-grid-row-number-edited-bg: color-mix(in oklab, rgb(245 158 11) 15%, var(--background));
     --data-grid-row-number-deleted-bg: color-mix(in oklab, var(--destructive) 15%, var(--background));
-    --data-grid-row-number-selected-bg: color-mix(in oklab, rgb(59 130 246) 30%, var(--background));
+    --data-grid-row-number-selected-bg: color-mix(in oklab, rgb(59 130 246) 45%, var(--background));
   }
+
   [data-grid-root].data-grid--has-save-error {
     --data-grid-cell-dirty-bg: rgb(250, 212, 216) !important;
     --data-grid-cell-selected-dirty-bg: rgb(240, 192, 198) !important;
+    --data-grid-row-selected-dirty-bg: rgb(240, 192, 198) !important;
   }
+
   [data-grid-root].data-grid--dark.data-grid--has-save-error,
   :global(.dark) [data-grid-root].data-grid--has-save-error {
     --data-grid-cell-dirty-bg: rgb(94, 56, 57) !important;
     --data-grid-cell-selected-dirty-bg: rgb(114, 66, 67) !important;
+    --data-grid-row-selected-dirty-bg: rgb(114, 66, 67) !important;
   }
 }
 
@@ -12685,10 +12703,12 @@ function currentGridContextMenuItems(): ContextMenuItem[] {
 
 :global(.dark) [data-grid-root] {
   --data-grid-cell-selected-bg: rgb(20, 40, 60);
+  --data-grid-row-selected-bg: rgb(37, 78, 116);
   --data-grid-cell-selected-single-bg: rgb(30, 64, 96);
   --data-grid-cell-selected-dirty-bg: rgb(76, 66, 38);
+  --data-grid-row-selected-dirty-bg: rgb(92, 88, 50);
   --data-grid-cell-selected-border: rgb(96, 165, 250);
-  --data-grid-row-number-selected-bg: rgb(30, 64, 96);
+  --data-grid-row-number-selected-bg: rgb(37, 78, 116);
 }
 
 [data-grid-root].data-grid--dark .data-grid-header-cell--selected,
@@ -13133,7 +13153,7 @@ function currentGridContextMenuItems(): ContextMenuItem[] {
 }
 
 .row-cell-selected {
-  background-color: var(--data-grid-cell-selected-bg) !important;
+  background-color: var(--data-grid-row-selected-bg) !important;
 }
 
 .cell-dirty {
@@ -13175,7 +13195,7 @@ function currentGridContextMenuItems(): ContextMenuItem[] {
 }
 
 .row-cell-selected-dirty {
-  background-color: var(--data-grid-cell-selected-dirty-bg) !important;
+  background-color: var(--data-grid-row-selected-dirty-bg) !important;
 }
 
 .data-grid-row-number.bg-emerald-500\/15 {
@@ -13240,69 +13260,83 @@ function currentGridContextMenuItems(): ContextMenuItem[] {
 .cell-sel-frame-1 {
   box-shadow: inset 0 1.5px 0 0 var(--data-grid-cell-selected-single-border, var(--primary));
 }
+
 .cell-sel-frame-2 {
   box-shadow: inset -1.5px 0 0 0 var(--data-grid-cell-selected-single-border, var(--primary));
 }
+
 .cell-sel-frame-3 {
   box-shadow:
     inset 0 1.5px 0 0 var(--data-grid-cell-selected-single-border, var(--primary)),
     inset -1.5px 0 0 0 var(--data-grid-cell-selected-single-border, var(--primary));
 }
+
 .cell-sel-frame-4 {
   box-shadow: inset 0 -1.5px 0 0 var(--data-grid-cell-selected-single-border, var(--primary));
 }
+
 .cell-sel-frame-5 {
   box-shadow:
     inset 0 1.5px 0 0 var(--data-grid-cell-selected-single-border, var(--primary)),
     inset 0 -1.5px 0 0 var(--data-grid-cell-selected-single-border, var(--primary));
 }
+
 .cell-sel-frame-6 {
   box-shadow:
     inset -1.5px 0 0 0 var(--data-grid-cell-selected-single-border, var(--primary)),
     inset 0 -1.5px 0 0 var(--data-grid-cell-selected-single-border, var(--primary));
 }
+
 .cell-sel-frame-7 {
   box-shadow:
     inset 0 1.5px 0 0 var(--data-grid-cell-selected-single-border, var(--primary)),
     inset -1.5px 0 0 0 var(--data-grid-cell-selected-single-border, var(--primary)),
     inset 0 -1.5px 0 0 var(--data-grid-cell-selected-single-border, var(--primary));
 }
+
 .cell-sel-frame-8 {
   box-shadow: inset 1.5px 0 0 0 var(--data-grid-cell-selected-single-border, var(--primary));
 }
+
 .cell-sel-frame-9 {
   box-shadow:
     inset 0 1.5px 0 0 var(--data-grid-cell-selected-single-border, var(--primary)),
     inset 1.5px 0 0 0 var(--data-grid-cell-selected-single-border, var(--primary));
 }
+
 .cell-sel-frame-10 {
   box-shadow:
     inset -1.5px 0 0 0 var(--data-grid-cell-selected-single-border, var(--primary)),
     inset 1.5px 0 0 0 var(--data-grid-cell-selected-single-border, var(--primary));
 }
+
 .cell-sel-frame-11 {
   box-shadow:
     inset 0 1.5px 0 0 var(--data-grid-cell-selected-single-border, var(--primary)),
     inset -1.5px 0 0 0 var(--data-grid-cell-selected-single-border, var(--primary)),
     inset 1.5px 0 0 0 var(--data-grid-cell-selected-single-border, var(--primary));
 }
+
 .cell-sel-frame-12 {
   box-shadow:
     inset 0 -1.5px 0 0 var(--data-grid-cell-selected-single-border, var(--primary)),
     inset 1.5px 0 0 0 var(--data-grid-cell-selected-single-border, var(--primary));
 }
+
 .cell-sel-frame-13 {
   box-shadow:
     inset 0 1.5px 0 0 var(--data-grid-cell-selected-single-border, var(--primary)),
     inset 0 -1.5px 0 0 var(--data-grid-cell-selected-single-border, var(--primary)),
     inset 1.5px 0 0 0 var(--data-grid-cell-selected-single-border, var(--primary));
 }
+
 .cell-sel-frame-14 {
   box-shadow:
     inset -1.5px 0 0 0 var(--data-grid-cell-selected-single-border, var(--primary)),
     inset 0 -1.5px 0 0 var(--data-grid-cell-selected-single-border, var(--primary)),
     inset 1.5px 0 0 0 var(--data-grid-cell-selected-single-border, var(--primary));
 }
+
 .cell-sel-frame-15 {
   box-shadow:
     inset 0 1.5px 0 0 var(--data-grid-cell-selected-single-border, var(--primary)),
