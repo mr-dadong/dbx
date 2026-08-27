@@ -5092,6 +5092,8 @@ export default withEnglishFallback({
     formatJsonDescription: "Object or array rows",
     formatExcel: "Excel",
     formatExcelDescription: "XLS, XLSX, XLSM",
+    formatSql: "SQL",
+    formatSqlDescription: "Istruzioni INSERT negli script SQL",
     previewRows: "Preview rows",
     delimiter: "Delimiter",
     encoding: "Codifica",

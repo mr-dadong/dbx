@@ -4466,7 +4466,7 @@ export async function sortTablesByFkDependency(options: SortTablesByFkOptions): 
 export type TableImportMode = "append" | "truncate";
 export type TableImportStatus = "running" | "done" | "error" | "cancelled";
 export type TableImportPhase = "preparing" | "detectingEncoding" | "reading" | "writing" | "finalizing" | "done";
-export type TableImportSourceFormat = "csv" | "tsv" | "delimited" | "json" | "excel";
+export type TableImportSourceFormat = "csv" | "tsv" | "delimited" | "json" | "excel" | "sql";
 export type TableImportJsonShape = "auto" | "objects" | "arrays";
 export type TableImportTextEncoding = "auto" | "utf8" | "gbk" | "utf16Le" | "utf16Be";
 
@@ -4488,6 +4488,7 @@ export interface TableImportParseOptions {
   sheetName?: string | null;
   sheetIndex?: number | null;
   jsonShape?: TableImportJsonShape | null;
+  sqlDialect?: DatabaseType | null;
 }
 
 export interface TableImportPreviewRequest {
