@@ -29,6 +29,8 @@ description: 通过向导将 CSV、TSV、文本、JSON、Excel 或 SQL 数据导
 
 SQL 导入只接受字面量 `INSERT INTO ... VALUES` 行；表达式、`REPLACE`、`INSERT IGNORE`、`INSERT ... SELECT` 等无法无损改写的内容会被拒绝，以保留数据和语句语义。
 
+SQL 导入通过非流式路径读取整个脚本，单个 `.sql` 文件不能超过 100 MB，超出上限会显式报错。`TO_DATE`、`TO_TIMESTAMP` 等日期函数的值会按第一个参数的文本导入，目标字段必须能解析该格式。
+
 Desktop 直接读取所选本地文件；Docker/Web 会先把浏览器选择的文件上传到服务器临时目录，预览和导入结束后释放临时源文件。
 
 ## 导入向导
