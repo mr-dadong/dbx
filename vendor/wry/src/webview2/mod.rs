@@ -2070,8 +2070,8 @@ mod tests {
   }
 
   #[test]
-  fn win7_target_uses_system_runtime_on_server_2012_r2() {
-    assert!(!should_use_fixed_runtime(true, 6, 3));
+  fn compatibility_target_uses_fixed_runtime_on_server_2012_r2() {
+    assert!(should_use_fixed_runtime(true, 6, 3));
   }
 
   #[test]
@@ -2180,7 +2180,7 @@ fn is_windows_7() -> bool {
 }
 
 fn should_use_fixed_runtime(is_win7_target: bool, os_major: u32, os_minor: u32) -> bool {
-  // 兼容目标也会运行在 Server 2012 R2 上，但该系统不能可靠加载 Fixed Runtime。
-  // 因此只有实际运行在 Windows 7（6.1）时才传入随包携带的 Runtime 路径。
-  is_win7_target && os_major == 6 && os_minor == 1
+  // Windows 7 与 Server 2012 R2 专用离线包都必须使用随包 Runtime，
+  // 避免旧系统依赖机器级 Evergreen 注册状态。
+  is_win7_target && os_major == 6 && matches!(os_minor, 1 | 3)
 }
