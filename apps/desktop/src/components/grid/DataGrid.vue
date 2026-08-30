@@ -12959,8 +12959,8 @@ function openGridSnapshot() {
                                     <SelectItem value="datetime">{{ t("grid.formatterDatetime") }}</SelectItem>
                                     <SelectItem value="json-path">{{ t("grid.formatterJsonPath") }}</SelectItem>
                                     <SelectItem value="mask">{{ t("grid.formatterMask") }}</SelectItem>
-                                    <SelectItem value="foreign-key-display">{{ t("grid.formatterForeignKeyDisplay") }}</SelectItem>
-                                    <SelectItem value="custom-template">{{ t("grid.formatterCustomTemplate") }}</SelectItem>
+                                    <SelectItem value="foreign-key-display">{{ t("grid.formatterForeignKeyDisplay") }} </SelectItem>
+                                    <SelectItem value="custom-template">{{ t("grid.formatterCustomTemplate") }} </SelectItem>
                                   </SelectContent>
                                 </Select>
                               </div>
@@ -13066,7 +13066,9 @@ function openGridSnapshot() {
 
                                 <template v-else>
                                   <div class="text-[11px] leading-4 text-muted-foreground">{{ t("grid.formatterForeignKeyManualHint") }}</div>
-                                  <div v-if="formatterForeignKeyTargetError" class="rounded border border-destructive/30 bg-destructive/5 px-2.5 py-2 text-[11px] text-destructive">{{ formatterForeignKeyTargetError }}</div>
+                                  <div v-if="formatterForeignKeyTargetError" class="rounded border border-destructive/30 bg-destructive/5 px-2.5 py-2 text-[11px] text-destructive">
+                                    {{ formatterForeignKeyTargetError }}
+                                  </div>
                                   <div class="grid grid-cols-2 gap-2">
                                     <div class="min-w-0 space-y-1.5">
                                       <div class="text-xs font-medium text-muted-foreground">{{ t("grid.formatterForeignKeySchema") }}</div>
@@ -13115,7 +13117,11 @@ function openGridSnapshot() {
                                         @update:model-value="(value: any) => (formatterForeignKeyRefColumn = String(value))"
                                       />
                                       <div v-if="formatterForeignKeyReferenceValidation === 'unavailable'" class="text-[11px] leading-4 text-destructive">
-                                        {{ t("grid.formatterForeignKeyReferenceMetadataUnavailable", { error: formatterForeignKeyReferenceMetadataError }) }}
+                                        {{
+                                          t("grid.formatterForeignKeyReferenceMetadataUnavailable", {
+                                            error: formatterForeignKeyReferenceMetadataError,
+                                          })
+                                        }}
                                       </div>
                                       <div v-else-if="formatterForeignKeyReferenceValidation === 'invalid' && formatterForeignKeyRefColumn" class="text-[11px] leading-4 text-destructive">
                                         {{ t("grid.formatterForeignKeyReferenceInvalid") }}
@@ -13159,7 +13165,9 @@ function openGridSnapshot() {
                                         @update:model-value="(value: any) => (formatterForeignKeyFilterColumn = String(value))"
                                       />
                                       <Select :model-value="formatterForeignKeyFilterMode" @update:model-value="(value: any) => selectFormatterForeignKeyFilterMode(value)">
-                                        <SelectTrigger class="h-8 text-xs"><SelectValue /></SelectTrigger>
+                                        <SelectTrigger class="h-8 text-xs">
+                                          <SelectValue />
+                                        </SelectTrigger>
                                         <SelectContent>
                                           <SelectItem v-for="option in filterModeOptions" :key="option.value" :value="option.value">{{ t(option.labelKey) }}</SelectItem>
                                         </SelectContent>
@@ -13190,7 +13198,7 @@ function openGridSnapshot() {
                                         <SelectValue />
                                       </SelectTrigger>
                                       <SelectContent>
-                                        <SelectItem :value="CUSTOM_FORMATTER_NEW">{{ t("grid.formatterNewCustom") }}</SelectItem>
+                                        <SelectItem :value="CUSTOM_FORMATTER_NEW">{{ t("grid.formatterNewCustom") }} </SelectItem>
                                         <SelectItem v-for="formatter in savedCustomFormatters" :key="formatter.id" :value="formatter.id">
                                           {{ formatter.name }}
                                         </SelectItem>
@@ -13780,9 +13788,20 @@ function openGridSnapshot() {
                       <Loader2 class="h-4 w-4 animate-spin" />
                     </div>
                     <div class="min-w-0 flex-1">
-                      <div class="truncate text-sm font-medium text-foreground">{{ t("grid.pageJumpLoading", { page: pageJumpProgress.targetPage }) }}</div>
+                      <div class="truncate text-sm font-medium text-foreground">
+                        {{
+                          t("grid.pageJumpLoading", {
+                            page: pageJumpProgress.targetPage,
+                          })
+                        }}
+                      </div>
                       <div class="mt-0.5 flex items-center justify-between gap-3 text-[11px] text-muted-foreground">
-                        <span>{{ t("grid.pageJumpProgress", { current: pageJumpProgress.completedRequests, total: pageJumpProgress.totalRequests }) }}</span>
+                        <span>{{
+                          t("grid.pageJumpProgress", {
+                            current: pageJumpProgress.completedRequests,
+                            total: pageJumpProgress.totalRequests,
+                          })
+                        }}</span>
                         <span class="shrink-0 tabular-nums">{{ formatElapsedSeconds(loadingElapsed) }}s</span>
                       </div>
                     </div>
@@ -14633,11 +14652,13 @@ function openGridSnapshot() {
     --data-grid-row-number-deleted-bg: color-mix(in oklab, var(--destructive) 15%, var(--background));
     --data-grid-row-number-selected-bg: color-mix(in oklab, rgb(59 130 246) 45%, var(--background));
   }
+
   [data-grid-root].data-grid--dark,
   :global(.dark) [data-grid-root] {
     --data-grid-cell-crosshair-row-bg: color-mix(in srgb, var(--primary) 34%, var(--background));
     --data-grid-cell-crosshair-col-bg: color-mix(in srgb, var(--primary) 50%, var(--background));
   }
+
   [data-grid-root].data-grid--has-save-error {
     --data-grid-cell-dirty-bg: rgb(250, 212, 216) !important;
     --data-grid-cell-selected-dirty-bg: rgb(240, 192, 198) !important;
