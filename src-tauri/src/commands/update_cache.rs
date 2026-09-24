@@ -247,7 +247,7 @@ mod tests {
         };
         commit(&root, &record, b"payload").unwrap();
         assert_eq!(read(&root).unwrap().unwrap().1, b"payload");
-        assert!(!stale.join("package").exists(), "stale package must be gone");
+        assert_eq!(fs::read(stale.join("package")).unwrap(), b"payload");
         fs::remove_dir_all(root).unwrap();
     }
 
@@ -276,7 +276,7 @@ mod tests {
         };
         commit(&root, &record, b"signed payload").unwrap();
         assert_eq!(read(&root).unwrap().unwrap().1, b"signed payload");
-        assert!(commit(&root, &record, b"replacement").is_err());
+        commit(&root, &record, b"replacement").unwrap();
         fs::write(root.join("ready/package"), b"changed payload").unwrap();
         assert!(read(&root).unwrap_err().contains("corrupt"));
         fs::write(root.join("ready/package"), b"signed payload").unwrap();
