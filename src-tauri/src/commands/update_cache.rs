@@ -63,6 +63,10 @@ pub(super) fn commit(root: &Path, record: &CacheRecord, bytes: &[u8]) -> Result<
         #[cfg(unix)]
         fs::File::open(&staging).and_then(|dir| dir.sync_all()).map_err(|e| e.to_string())?;
         let ready = root.join("ready");
+        // Windows cannot rename onto an existing directory: `fs::rename` fails with
+        // `os error 5` when `ready` is still present from an earlier attempt. Clear
+        // it first so the commit is idempotent and does not need a manual retry.
+        discard(root)?;
         fs::rename(&staging, &ready)
             .map_err(|error| context("Failed to finalize the DBX update cache", &ready, error))?;
         #[cfg(unix)]
@@ -212,6 +216,38 @@ mod tests {
         assert!(read(&root).is_err());
         discard(&root).unwrap();
         assert!(outside.join("keep").exists());
+        fs::remove_dir_all(root).unwrap();
+    }
+
+    // A leftover `ready` from an earlier attempt is invisible to `ensure_writable`,
+    // yet Windows cannot rename onto an existing directory, so commit must clear it.
+    #[test]
+    fn commit_replaces_a_leftover_ready_directory_without_a_manual_retry() {
+        let root = std::env::temp_dir().join(uuid::Uuid::new_v4().to_string());
+        let stale = root.join("ready");
+        fs::create_dir_all(&stale).unwrap();
+        fs::write(stale.join("package"), b"previous attempt").unwrap();
+        let record = CacheRecord {
+            schema_version: 1,
+            package_kind: "test".into(),
+            package_length: 7,
+            package_sha256: digest(b"payload"),
+            info: DownloadedUpdate {
+                cache_id: "test".into(),
+                version: "99.0.0".into(),
+                portable_mode: false,
+                release_url: String::new(),
+                release_notes: String::new(),
+                downloaded_at: 1,
+            },
+            os: std::env::consts::OS.into(),
+            arch: std::env::consts::ARCH.into(),
+            manifest: None,
+            signature: None,
+        };
+        commit(&root, &record, b"payload").unwrap();
+        assert_eq!(read(&root).unwrap().unwrap().1, b"payload");
+        assert!(!stale.join("package").exists(), "stale package must be gone");
         fs::remove_dir_all(root).unwrap();
     }
 
