@@ -7225,7 +7225,7 @@ onUnmounted(() => {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="manual">{{ t("settings.completionTriggerModeManual") }}</SelectItem>
-                      <SelectItem value="require-prefix">{{ t("settings.completionTriggerModeRequirePrefix") }} </SelectItem>
+                      <SelectItem value="require-prefix">{{ t("settings.completionTriggerModeRequirePrefix") }}</SelectItem>
                       <SelectItem value="positional">{{ t("settings.completionTriggerModePositional") }}</SelectItem>
                     </SelectContent>
                   </Select>
@@ -7337,8 +7337,8 @@ onUnmounted(() => {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="never">{{ t("settings.tableCompletionSchemaQualificationNever") }}</SelectItem>
-                      <SelectItem value="collision">{{ t("settings.tableCompletionSchemaQualificationCollision") }} </SelectItem>
-                      <SelectItem value="always">{{ t("settings.tableCompletionSchemaQualificationAlways") }} </SelectItem>
+                      <SelectItem value="collision">{{ t("settings.tableCompletionSchemaQualificationCollision") }}</SelectItem>
+                      <SelectItem value="always">{{ t("settings.tableCompletionSchemaQualificationAlways") }}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -7499,7 +7499,7 @@ onUnmounted(() => {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="prompt">{{ t("settings.appCloseUnsavedTabsModePrompt") }}</SelectItem>
-                          <SelectItem value="keep-drafts">{{ t("settings.appCloseUnsavedTabsModeKeepDrafts") }} </SelectItem>
+                          <SelectItem value="keep-drafts">{{ t("settings.appCloseUnsavedTabsModeKeepDrafts") }}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -7602,12 +7602,7 @@ onUnmounted(() => {
                       {{ t("settings.externalSqlEditorMaxMb") }}
                     </Label>
                     <p class="text-xs text-muted-foreground">
-                      {{
-                        t("settings.externalSqlEditorMaxMbDescription", {
-                          min: MIN_EXTERNAL_SQL_EDITOR_FILE_MB,
-                          max: MAX_EXTERNAL_SQL_EDITOR_FILE_MB,
-                        })
-                      }}
+                      {{ t("settings.externalSqlEditorMaxMbDescription", { min: MIN_EXTERNAL_SQL_EDITOR_FILE_MB, max: MAX_EXTERNAL_SQL_EDITOR_FILE_MB }) }}
                     </p>
                   </div>
                   <Input
@@ -8015,9 +8010,7 @@ onUnmounted(() => {
                   <div class="space-y-2">
                     <Label>{{ t("settings.tabPlacement") }}</Label>
                     <Select :model-value="editTabPlacement" @update:model-value="setTabPlacement($event as TabPlacement)">
-                      <SelectTrigger class="w-full">
-                        <SelectValue />
-                      </SelectTrigger>
+                      <SelectTrigger class="w-full"><SelectValue /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="top">{{ t("settings.tabPlacementTop") }}</SelectItem>
                         <SelectItem value="bottom">{{ t("settings.tabPlacementBottom") }}</SelectItem>
@@ -8029,9 +8022,7 @@ onUnmounted(() => {
                   <div class="space-y-2">
                     <Label>{{ t("settings.tabGroup") }}</Label>
                     <Select :model-value="editTabGroupMode" @update:model-value="setTabGroupMode($event as TabGroupMode)">
-                      <SelectTrigger class="w-full">
-                        <SelectValue />
-                      </SelectTrigger>
+                      <SelectTrigger class="w-full"><SelectValue /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="none">{{ t("settings.tabGroupNone") }}</SelectItem>
                         <SelectItem value="database-type">{{ t("settings.tabGroupDatabaseType") }}</SelectItem>
@@ -8044,9 +8035,7 @@ onUnmounted(() => {
                   <div class="space-y-2">
                     <Label>{{ t("settings.tabSort") }}</Label>
                     <Select :model-value="editTabSortMode" @update:model-value="setTabSortMode($event as TabSortMode)">
-                      <SelectTrigger class="w-full">
-                        <SelectValue />
-                      </SelectTrigger>
+                      <SelectTrigger class="w-full"><SelectValue /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="manual">{{ t("settings.tabSortManual") }}</SelectItem>
                         <SelectItem value="created-asc">{{ t("settings.tabSortCreated") }}</SelectItem>
@@ -8057,9 +8046,7 @@ onUnmounted(() => {
                   <div class="space-y-2">
                     <Label>{{ t("settings.tabMaxWidth") }}</Label>
                     <Select :model-value="String(editTabMaxWidth)" @update:model-value="setTabMaxWidth(Number($event))">
-                      <SelectTrigger class="w-full">
-                        <SelectValue />
-                      </SelectTrigger>
+                      <SelectTrigger class="w-full"><SelectValue /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="0">{{ t("settings.tabMaxWidthUnlimited") }}</SelectItem>
                         <SelectItem value="160">{{ t("settings.tabMaxWidthCompact") }}</SelectItem>
@@ -8568,12 +8555,12 @@ onUnmounted(() => {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="close-tabs">{{ t("settings.deleteConnectionTabHandlingModeCloseTabs") }} </SelectItem>
-                    <SelectItem value="keep-sql-tabs">{{ t("settings.deleteConnectionTabHandlingModeKeepSqlTabs") }} </SelectItem>
+                    <SelectItem value="close-tabs">{{ t("settings.deleteConnectionTabHandlingModeCloseTabs") }}</SelectItem>
+                    <SelectItem value="keep-sql-tabs">{{ t("settings.deleteConnectionTabHandlingModeKeepSqlTabs") }}</SelectItem>
                     <SelectItem value="keep-pinned-sql-tabs">
                       {{ t("settings.deleteConnectionTabHandlingModeKeepPinnedSqlTabs") }}
                     </SelectItem>
-                    <SelectItem value="keep-all-tabs">{{ t("settings.deleteConnectionTabHandlingModeKeepAllTabs") }} </SelectItem>
+                    <SelectItem value="keep-all-tabs">{{ t("settings.deleteConnectionTabHandlingModeKeepAllTabs") }}</SelectItem>
                   </SelectContent>
                 </Select>
                 <p class="text-xs text-muted-foreground">
@@ -8614,8 +8601,8 @@ onUnmounted(() => {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="comment-inline">{{ t("settings.sidebarObjectInfoModeCommentInline") }} </SelectItem>
-                    <SelectItem value="comment-aligned">{{ t("settings.sidebarObjectInfoModeCommentAligned") }} </SelectItem>
+                    <SelectItem value="comment-inline">{{ t("settings.sidebarObjectInfoModeCommentInline") }}</SelectItem>
+                    <SelectItem value="comment-aligned">{{ t("settings.sidebarObjectInfoModeCommentAligned") }}</SelectItem>
                     <SelectItem value="comment-right">{{ t("settings.sidebarObjectInfoModeCommentRight") }}</SelectItem>
                     <SelectItem value="size">{{ t("settings.sidebarObjectInfoModeSize") }}</SelectItem>
                     <SelectItem value="hidden">{{ t("settings.sidebarObjectInfoModeHidden") }}</SelectItem>
@@ -8794,9 +8781,7 @@ onUnmounted(() => {
                   <p class="text-xs text-muted-foreground">{{ t("settings.historyRetentionDescription") }}</p>
                 </div>
                 <Select :model-value="String(editHistoryRetentionLimit)" :disabled="!historyRetentionLoaded || historyRetentionSaving" @update:model-value="(value) => (editHistoryRetentionLimit = Number(value))">
-                  <SelectTrigger id="history-retention-limit" class="w-40 shrink-0">
-                    <SelectValue />
-                  </SelectTrigger>
+                  <SelectTrigger id="history-retention-limit" class="w-40 shrink-0"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem v-for="limit in HISTORY_RETENTION_LIMITS" :key="limit" :value="String(limit)">{{ limit === 0 ? t("settings.historyRetentionUnlimited") : String(limit) }}</SelectItem>
                   </SelectContent>
@@ -8814,12 +8799,10 @@ onUnmounted(() => {
                 </div>
                 <div class="flex shrink-0 items-center gap-2">
                   <Select :model-value="String(editMcpHistoryRetentionLimit)" :disabled="!mcpHistoryRetentionLoaded || mcpHistoryRetentionSaving" @update:model-value="(value) => (editMcpHistoryRetentionLimit = Number(value))">
-                    <SelectTrigger id="mcp-history-retention-limit" class="w-40">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem v-for="limit in HISTORY_RETENTION_LIMITS" :key="limit" :value="String(limit)">{{ limit === 0 ? t("settings.historyRetentionUnlimited") : String(limit) }}</SelectItem>
-                    </SelectContent>
+                    <SelectTrigger id="mcp-history-retention-limit" class="w-40"><SelectValue /></SelectTrigger>
+                    <SelectContent
+                      ><SelectItem v-for="limit in HISTORY_RETENTION_LIMITS" :key="limit" :value="String(limit)">{{ limit === 0 ? t("settings.historyRetentionUnlimited") : String(limit) }}</SelectItem></SelectContent
+                    >
                   </Select>
                   <p v-if="mcpHistoryRetentionLoading" class="text-xs text-muted-foreground">{{ t("common.loading") }}</p>
                   <div v-if="mcpHistoryRetentionLoadError" class="flex items-center gap-2 text-xs text-destructive" role="alert">
@@ -8965,9 +8948,7 @@ onUnmounted(() => {
                     <div class="flex-1 px-2 py-1.5 text-[11px]">
                       <div class="grid min-h-7 grid-cols-[18px_18px_minmax(0,1fr)_72px_minmax(0,1.2fr)_36px] items-center gap-1 border-b border-border/45">
                         <GripVertical class="h-3.5 w-3.5 text-muted-foreground" />
-                        <span class="flex h-3.5 w-3.5 items-center justify-center border border-primary bg-primary/10 text-primary">
-                          <Check class="h-3 w-3" />
-                        </span>
+                        <span class="flex h-3.5 w-3.5 items-center justify-center border border-primary bg-primary/10 text-primary"><Check class="h-3 w-3" /></span>
                         <span class="truncate px-1">status</span>
                         <span class="truncate px-1">=</span>
                         <span class="truncate px-1">ACTIVE</span>
@@ -9126,15 +9107,7 @@ onUnmounted(() => {
                       {{ t("settings.queryResultMaxRows") }}
                     </Label>
                     <p class="text-xs" :class="queryResultRowLimitViolated ? 'text-destructive' : 'text-muted-foreground'">
-                      {{
-                        queryResultRowLimitViolated
-                          ? t("settings.queryResultMaxRowsTooSmall", {
-                              pageSize: editPageSize,
-                            })
-                          : editQueryResultMaxRowsEnabled
-                            ? t("settings.queryResultMaxRowsDescription")
-                            : t("settings.queryResultMaxRowsUnlimitedDescription")
-                      }}
+                      {{ queryResultRowLimitViolated ? t("settings.queryResultMaxRowsTooSmall", { pageSize: editPageSize }) : editQueryResultMaxRowsEnabled ? t("settings.queryResultMaxRowsDescription") : t("settings.queryResultMaxRowsUnlimitedDescription") }}
                     </p>
                   </div>
                   <div class="flex shrink-0 items-center gap-2">
@@ -9716,12 +9689,7 @@ onUnmounted(() => {
                       {{ t("settings.webSqlFileUploadMaxMb") }}
                     </Label>
                     <p class="text-xs text-muted-foreground">
-                      {{
-                        t("settings.webSqlFileUploadMaxMbDescription", {
-                          min: MIN_EXTERNAL_SQL_EDITOR_FILE_MB,
-                          max: MAX_EXTERNAL_SQL_EDITOR_FILE_MB,
-                        })
-                      }}
+                      {{ t("settings.webSqlFileUploadMaxMbDescription", { min: MIN_EXTERNAL_SQL_EDITOR_FILE_MB, max: MAX_EXTERNAL_SQL_EDITOR_FILE_MB }) }}
                     </p>
                   </div>
                   <div class="flex shrink-0 items-center gap-2">
@@ -9946,11 +9914,7 @@ onUnmounted(() => {
                     <component :is="shortcutScopeIcon(group.scope)" class="h-3.5 w-3.5 shrink-0 text-muted-foreground" aria-hidden="true" />
                     <h3 class="shrink-0 text-[13px] leading-none font-semibold">{{ group.label }}</h3>
                     <span class="shrink-0 rounded-sm border border-border/80 px-1 font-mono text-[10px] leading-4 text-muted-foreground/75">{{ group.scope }}</span>
-                    <span class="shrink-0 text-[11px] tabular-nums text-muted-foreground">{{
-                      t("settings.shortcutGroupCount", {
-                        count: group.definitions.length,
-                      })
-                    }}</span>
+                    <span class="shrink-0 text-[11px] tabular-nums text-muted-foreground">{{ t("settings.shortcutGroupCount", { count: group.definitions.length }) }}</span>
                     <LightTooltip v-if="group.unboundCount > 0" :text="t('settings.shortcutGroupUnboundTooltip')">
                       <span class="shrink-0 cursor-help text-[11px] tabular-nums text-muted-foreground/70">
                         {{ t("settings.shortcutGroupUnbound", { count: group.unboundCount }) }}
@@ -10163,10 +10127,10 @@ onUnmounted(() => {
               <div class="rounded-md border bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
                 <p>{{ t("settings.snippetsPlaceholderHint") }}</p>
                 <pre class="mt-2 overflow-x-auto whitespace-pre-wrap rounded bg-background/70 px-2 py-1.5 font-mono text-[11px] leading-relaxed text-foreground">
-      SELECT t.*
-      FROM ${1:table} t
-      WHERE t.del_flag = 0
-      LIMIT 100;</pre>
+SELECT t.*
+FROM ${1:table} t
+WHERE t.del_flag = 0
+LIMIT 100;</pre>
               </div>
 
               <div class="overflow-x-auto rounded-md border">
@@ -10368,9 +10332,7 @@ onUnmounted(() => {
                     <div class="space-y-2">
                       <Label>{{ t("settings.syncSnippetProvider") }}</Label>
                       <Select v-model="snippetProvider" :disabled="!!snippetBusy">
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
                         <SelectContent>
                           <SelectItem value="github">GitHub Gist</SelectItem>
                           <SelectItem value="gitee">{{ t("settings.syncSnippetProviderGitee") }}</SelectItem>
@@ -10683,12 +10645,7 @@ onUnmounted(() => {
                         <span class="text-xs text-muted-foreground">px</span>
                       </div>
                       <p class="text-[11px] text-muted-foreground">
-                        {{
-                          t("ai.conversationFontSizeRange", {
-                            min: AI_CONVERSATION_FONT_SIZE_MIN,
-                            max: AI_CONVERSATION_FONT_SIZE_MAX,
-                          })
-                        }}
+                        {{ t("ai.conversationFontSizeRange", { min: AI_CONVERSATION_FONT_SIZE_MIN, max: AI_CONVERSATION_FONT_SIZE_MAX }) }}
                       </p>
                     </div>
                   </div>
@@ -11386,15 +11343,15 @@ onUnmounted(() => {
                     </div>
                     <Tabs v-model="mcpTransportTab" class="space-y-3">
                       <TabsList variant="line" class="h-8 w-fit justify-start gap-1 border-b border-border/60 bg-transparent p-0">
-                        <TabsTrigger value="stdio" class="flex-none px-3">{{ t("settings.mcpTransportLocalStdio") }} </TabsTrigger>
-                        <TabsTrigger value="http" class="flex-none px-3">{{ t("settings.mcpTransportHttpService") }} </TabsTrigger>
+                        <TabsTrigger value="stdio" class="flex-none px-3">{{ t("settings.mcpTransportLocalStdio") }}</TabsTrigger>
+                        <TabsTrigger value="http" class="flex-none px-3">{{ t("settings.mcpTransportHttpService") }}</TabsTrigger>
                       </TabsList>
                       <TabsContent value="http" class="m-0 space-y-4">
                         <div v-if="isWeb" class="space-y-4">
                           <div class="space-y-3 border-t border-border/60 pt-3">
                             <div class="flex items-center justify-between gap-3">
                               <Label class="text-base">{{ t("settings.mcpHttpWebServiceTitle") }}</Label>
-                              <Badge :variant="webMcpHttpStatus?.enabled ? 'default' : 'outline'">{{ webMcpHttpStatus?.enabled ? t("settings.mcpHttpStatusLabelEnabled") : t("settings.mcpHttpStatusLabelDisabled") }} </Badge>
+                              <Badge :variant="webMcpHttpStatus?.enabled ? 'default' : 'outline'">{{ webMcpHttpStatus?.enabled ? t("settings.mcpHttpStatusLabelEnabled") : t("settings.mcpHttpStatusLabelDisabled") }}</Badge>
                             </div>
                             <p class="text-xs text-muted-foreground">{{ t("settings.mcpHttpWebServiceDescription") }}</p>
                             <p v-if="mcpHttpError" class="text-xs text-destructive">{{ mcpHttpError }}</p>
@@ -11409,13 +11366,7 @@ onUnmounted(() => {
                                   })
                                 }}
                               </p>
-                              <p v-if="webMcpHttpStatus.allowedOrigins.length" class="text-[11px] text-muted-foreground">
-                                {{
-                                  t("settings.mcpHttpWebAllowedOrigins", {
-                                    origins: webMcpHttpStatus.allowedOrigins.join(", "),
-                                  })
-                                }}
-                              </p>
+                              <p v-if="webMcpHttpStatus.allowedOrigins.length" class="text-[11px] text-muted-foreground">{{ t("settings.mcpHttpWebAllowedOrigins", { origins: webMcpHttpStatus.allowedOrigins.join(", ") }) }}</p>
                               <p v-if="webMcpHttpStatus.deploymentManaged" class="text-xs text-muted-foreground">{{ t("settings.mcpHttpWebDeploymentManaged") }}</p>
                               <p v-else-if="!webMcpHttpStatus.managementAvailable" class="text-xs text-muted-foreground">{{ t("settings.mcpHttpWebPasswordRequired") }}</p>
                               <template v-else>
@@ -11558,7 +11509,7 @@ onUnmounted(() => {
                                 <span class="h-2 w-2 rounded-full" :class="mcpHttpStatus.running ? 'bg-green-500' : 'bg-amber-500'" />
                                 {{ mcpHttpStatus.running ? t("settings.mcpHttpConnectionInfoTitle") : t("settings.mcpHttpServiceNotRunning") }}
                               </div>
-                              <Badge variant="outline" class="font-normal">{{ mcpHttpStatus.running ? t("settings.mcpHttpRunningConfigBadge") : t("settings.mcpHttpLastStatusBadge") }} </Badge>
+                              <Badge variant="outline" class="font-normal">{{ mcpHttpStatus.running ? t("settings.mcpHttpRunningConfigBadge") : t("settings.mcpHttpLastStatusBadge") }}</Badge>
                             </div>
                             <p v-if="mcpHttpHasUnsavedChanges" class="rounded bg-amber-500/10 px-3 py-2 text-xs text-amber-800 dark:text-amber-200">{{ t("settings.mcpHttpRunningDraftDiffersHint") }}</p>
                             <div v-if="mcpHttpStatus.endpoint" class="space-y-1">
@@ -11601,7 +11552,7 @@ onUnmounted(() => {
                             </details>
                             <details v-if="mcpHttpStatus.recentLogs.length" class="text-xs">
                               <summary class="cursor-pointer text-muted-foreground">{{ t("settings.mcpHttpLogsTitle") }}</summary>
-                              <pre class="mt-2 max-h-40 overflow-auto rounded border bg-background p-2 text-[11px] whitespace-pre-wrap">                    {{ mcpHttpStatus.recentLogs.join("\n") }}</pre>
+                              <pre class="mt-2 max-h-40 overflow-auto rounded border bg-background p-2 text-[11px] whitespace-pre-wrap">{{ mcpHttpStatus.recentLogs.join("\n") }}</pre>
                             </details>
                           </section>
                         </div>
@@ -11828,15 +11779,9 @@ onUnmounted(() => {
                               <table class="w-full min-w-[30rem] border-separate border-spacing-0 text-xs">
                                 <thead class="text-muted-foreground">
                                   <tr>
-                                    <th scope="col" class="sticky top-0 z-10 bg-muted px-3 py-2 text-left font-medium shadow-[0_1px_0_hsl(var(--border))]">
-                                      {{ t("settings.mcpPermissionPreviewResource") }}
-                                    </th>
-                                    <th scope="col" class="sticky top-0 z-10 bg-muted px-3 py-2 text-left font-medium shadow-[0_1px_0_hsl(var(--border))]">
-                                      {{ t("settings.mcpPermissionPreviewEffective") }}
-                                    </th>
-                                    <th scope="col" class="sticky top-0 z-10 bg-muted px-3 py-2 text-left font-medium shadow-[0_1px_0_hsl(var(--border))]">
-                                      {{ t("settings.mcpPermissionPreviewSource") }}
-                                    </th>
+                                    <th scope="col" class="sticky top-0 z-10 bg-muted px-3 py-2 text-left font-medium shadow-[0_1px_0_hsl(var(--border))]">{{ t("settings.mcpPermissionPreviewResource") }}</th>
+                                    <th scope="col" class="sticky top-0 z-10 bg-muted px-3 py-2 text-left font-medium shadow-[0_1px_0_hsl(var(--border))]">{{ t("settings.mcpPermissionPreviewEffective") }}</th>
+                                    <th scope="col" class="sticky top-0 z-10 bg-muted px-3 py-2 text-left font-medium shadow-[0_1px_0_hsl(var(--border))]">{{ t("settings.mcpPermissionPreviewSource") }}</th>
                                   </tr>
                                 </thead>
                                 <tbody>
@@ -11908,26 +11853,25 @@ onUnmounted(() => {
                     </div>
                     <Tabs v-model="mcpConfigTab" class="space-y-3">
                       <TabsList class="settings-mcp-config-tabs h-auto min-h-8 w-full min-w-0 max-w-full justify-start gap-1 overflow-x-auto overflow-y-hidden overscroll-x-contain group-data-horizontal/tabs:h-auto">
-                        <TabsTrigger value="claude" class="settings-mcp-config-tab h-7 flex-none shrink-0 px-2.5">Claude Code </TabsTrigger>
-                        <TabsTrigger value="cursor" class="settings-mcp-config-tab h-7 flex-none shrink-0 px-2.5">Cursor </TabsTrigger>
-                        <TabsTrigger value="codebuddy" class="settings-mcp-config-tab h-7 flex-none shrink-0 px-2.5"> CodeBuddy Code CLI </TabsTrigger>
-                        <TabsTrigger value="zcode" class="settings-mcp-config-tab h-7 flex-none shrink-0 px-2.5">ZCode </TabsTrigger>
-                        <TabsTrigger value="trae" class="settings-mcp-config-tab h-7 flex-none shrink-0 px-2.5">TRAE </TabsTrigger>
+                        <TabsTrigger value="claude" class="settings-mcp-config-tab h-7 flex-none shrink-0 px-2.5">Claude Code</TabsTrigger>
+                        <TabsTrigger value="cursor" class="settings-mcp-config-tab h-7 flex-none shrink-0 px-2.5">Cursor</TabsTrigger>
+                        <TabsTrigger value="codebuddy" class="settings-mcp-config-tab h-7 flex-none shrink-0 px-2.5">CodeBuddy Code CLI</TabsTrigger>
+                        <TabsTrigger value="zcode" class="settings-mcp-config-tab h-7 flex-none shrink-0 px-2.5">ZCode</TabsTrigger>
+                        <TabsTrigger value="trae" class="settings-mcp-config-tab h-7 flex-none shrink-0 px-2.5">TRAE</TabsTrigger>
                         <TabsTrigger value="vscode" class="settings-mcp-config-tab h-7 flex-none shrink-0 px-2.5">VS Code</TabsTrigger>
-                        <TabsTrigger value="windsurf" class="settings-mcp-config-tab h-7 flex-none shrink-0 px-2.5"> Windsurf </TabsTrigger>
-                        <TabsTrigger value="codex" class="settings-mcp-config-tab h-7 flex-none shrink-0 px-2.5">Codex </TabsTrigger>
+                        <TabsTrigger value="windsurf" class="settings-mcp-config-tab h-7 flex-none shrink-0 px-2.5">Windsurf</TabsTrigger>
+                        <TabsTrigger value="codex" class="settings-mcp-config-tab h-7 flex-none shrink-0 px-2.5">Codex</TabsTrigger>
                         <TabsTrigger value="deepseek-harness" class="settings-mcp-config-tab h-7 flex-none shrink-0 px-2.5">DeepSeek Harness</TabsTrigger>
-                        <TabsTrigger value="opencode" class="settings-mcp-config-tab h-7 flex-none shrink-0 px-2.5"> OpenCode </TabsTrigger>
-                        <TabsTrigger value="pi" class="settings-mcp-config-tab h-7 flex-none shrink-0 px-2.5">Pi </TabsTrigger>
-                        <TabsTrigger value="cherry-studio" class="settings-mcp-config-tab h-7 flex-none shrink-0 px-2.5">Cherry Studio </TabsTrigger>
-                        <TabsTrigger value="qoder" class="settings-mcp-config-tab h-7 flex-none shrink-0 px-2.5">Qoder </TabsTrigger>
-                        <TabsTrigger value="workbuddy" class="settings-mcp-config-tab h-7 flex-none shrink-0 px-2.5"> WorkBuddy </TabsTrigger>
+                        <TabsTrigger value="opencode" class="settings-mcp-config-tab h-7 flex-none shrink-0 px-2.5">OpenCode</TabsTrigger>
+                        <TabsTrigger value="pi" class="settings-mcp-config-tab h-7 flex-none shrink-0 px-2.5">Pi</TabsTrigger>
+                        <TabsTrigger value="cherry-studio" class="settings-mcp-config-tab h-7 flex-none shrink-0 px-2.5">Cherry Studio</TabsTrigger>
+                        <TabsTrigger value="qoder" class="settings-mcp-config-tab h-7 flex-none shrink-0 px-2.5">Qoder</TabsTrigger>
+                        <TabsTrigger value="workbuddy" class="settings-mcp-config-tab h-7 flex-none shrink-0 px-2.5">WorkBuddy</TabsTrigger>
                       </TabsList>
 
                       <TabsContent value="claude" class="m-0">
                         <div class="relative rounded-md border bg-background p-3">
-                          <pre class="overflow-x-auto whitespace-pre text-xs leading-relaxed"><code>{{ mcpJsonRecommendedConfig
-              }}</code></pre>
+                          <pre class="overflow-x-auto whitespace-pre text-xs leading-relaxed"><code>{{ mcpJsonRecommendedConfig }}</code></pre>
                           <Button type="button" variant="outline" size="icon" class="absolute right-2 top-2 h-7 w-7" :title="t('common.copy')" @click="copyMcpText('claude-config', mcpJsonRecommendedConfig)">
                             <CheckCircle2 v-if="mcpCopied === 'claude-config'" class="h-3.5 w-3.5 text-green-500" />
                             <Copy v-else class="h-3.5 w-3.5" />
@@ -11941,8 +11885,7 @@ onUnmounted(() => {
                             {{ t("settings.mcpCursorConfigPath") }}
                           </div>
                           <div class="relative rounded-md border bg-background p-3">
-                            <pre class="overflow-x-auto whitespace-pre text-xs leading-relaxed"><code>{{ mcpJsonRecommendedConfig
-                }}</code></pre>
+                            <pre class="overflow-x-auto whitespace-pre text-xs leading-relaxed"><code>{{ mcpJsonRecommendedConfig }}</code></pre>
                             <Button type="button" variant="outline" size="icon" class="absolute right-2 top-2 h-7 w-7" :title="t('common.copy')" @click="copyMcpText('cursor-config', mcpJsonRecommendedConfig)">
                               <CheckCircle2 v-if="mcpCopied === 'cursor-config'" class="h-3.5 w-3.5 text-green-500" />
                               <Copy v-else class="h-3.5 w-3.5" />
@@ -11957,8 +11900,7 @@ onUnmounted(() => {
                             {{ t("settings.mcpCodeBuddyConfigPath") }}
                           </div>
                           <div class="relative rounded-md border bg-background p-3">
-                            <pre class="overflow-x-auto whitespace-pre text-xs leading-relaxed"><code>{{ mcpJsonRecommendedConfig
-                }}</code></pre>
+                            <pre class="overflow-x-auto whitespace-pre text-xs leading-relaxed"><code>{{ mcpJsonRecommendedConfig }}</code></pre>
                             <Button type="button" variant="outline" size="icon" class="absolute right-2 top-2 h-7 w-7" :title="t('common.copy')" @click="copyMcpText('codebuddy-config', mcpJsonRecommendedConfig)">
                               <CheckCircle2 v-if="mcpCopied === 'codebuddy-config'" class="h-3.5 w-3.5 text-green-500" />
                               <Copy v-else class="h-3.5 w-3.5" />
@@ -11973,8 +11915,7 @@ onUnmounted(() => {
                             {{ t("settings.mcpZCodeConfigPath") }}
                           </div>
                           <div class="relative rounded-md border bg-background p-3">
-                            <pre class="overflow-x-auto whitespace-pre text-xs leading-relaxed"><code>{{ mcpJsonRecommendedConfig
-                }}</code></pre>
+                            <pre class="overflow-x-auto whitespace-pre text-xs leading-relaxed"><code>{{ mcpJsonRecommendedConfig }}</code></pre>
                             <Button type="button" variant="outline" size="icon" class="absolute right-2 top-2 h-7 w-7" :title="t('common.copy')" @click="copyMcpText('zcode-config', mcpJsonRecommendedConfig)">
                               <CheckCircle2 v-if="mcpCopied === 'zcode-config'" class="h-3.5 w-3.5 text-green-500" />
                               <Copy v-else class="h-3.5 w-3.5" />
@@ -11989,8 +11930,7 @@ onUnmounted(() => {
                             {{ t("settings.mcpTraeConfigPath") }}
                           </div>
                           <div class="relative rounded-md border bg-background p-3">
-                            <pre class="overflow-x-auto whitespace-pre text-xs leading-relaxed"><code>{{ mcpTraeRecommendedConfig
-                }}</code></pre>
+                            <pre class="overflow-x-auto whitespace-pre text-xs leading-relaxed"><code>{{ mcpTraeRecommendedConfig }}</code></pre>
                             <Button type="button" variant="outline" size="icon" class="absolute right-2 top-2 h-7 w-7" :title="t('common.copy')" @click="copyMcpText('trae-config', mcpTraeRecommendedConfig)">
                               <CheckCircle2 v-if="mcpCopied === 'trae-config'" class="h-3.5 w-3.5 text-green-500" />
                               <Copy v-else class="h-3.5 w-3.5" />
@@ -12005,8 +11945,7 @@ onUnmounted(() => {
                             {{ t("settings.mcpVsCodeConfigPath") }}
                           </div>
                           <div class="relative rounded-md border bg-background p-3">
-                            <pre class="overflow-x-auto whitespace-pre text-xs leading-relaxed"><code>{{ mcpVsCodeRecommendedConfig
-                }}</code></pre>
+                            <pre class="overflow-x-auto whitespace-pre text-xs leading-relaxed"><code>{{ mcpVsCodeRecommendedConfig }}</code></pre>
                             <Button type="button" variant="outline" size="icon" class="absolute right-2 top-2 h-7 w-7" :title="t('common.copy')" @click="copyMcpText('vscode-config', mcpVsCodeRecommendedConfig)">
                               <CheckCircle2 v-if="mcpCopied === 'vscode-config'" class="h-3.5 w-3.5 text-green-500" />
                               <Copy v-else class="h-3.5 w-3.5" />
@@ -12021,8 +11960,7 @@ onUnmounted(() => {
                             {{ t("settings.mcpWindsurfConfigPath") }}
                           </div>
                           <div class="relative rounded-md border bg-background p-3">
-                            <pre class="overflow-x-auto whitespace-pre text-xs leading-relaxed"><code>{{ mcpJsonRecommendedConfig
-                }}</code></pre>
+                            <pre class="overflow-x-auto whitespace-pre text-xs leading-relaxed"><code>{{ mcpJsonRecommendedConfig }}</code></pre>
                             <Button type="button" variant="outline" size="icon" class="absolute right-2 top-2 h-7 w-7" :title="t('common.copy')" @click="copyMcpText('windsurf-config', mcpJsonRecommendedConfig)">
                               <CheckCircle2 v-if="mcpCopied === 'windsurf-config'" class="h-3.5 w-3.5 text-green-500" />
                               <Copy v-else class="h-3.5 w-3.5" />
@@ -12037,8 +11975,7 @@ onUnmounted(() => {
                             {{ t("settings.mcpCodexConfigPath") }}
                           </div>
                           <div class="relative rounded-md border bg-background p-3">
-                            <pre class="overflow-x-auto whitespace-pre text-xs leading-relaxed"><code>{{ mcpCodexRecommendedConfig
-                }}</code></pre>
+                            <pre class="overflow-x-auto whitespace-pre text-xs leading-relaxed"><code>{{ mcpCodexRecommendedConfig }}</code></pre>
                             <Button type="button" variant="outline" size="icon" class="absolute right-2 top-2 h-7 w-7" :title="t('common.copy')" @click="copyMcpText('codex-config', mcpCodexRecommendedConfig)">
                               <CheckCircle2 v-if="mcpCopied === 'codex-config'" class="h-3.5 w-3.5 text-green-500" />
                               <Copy v-else class="h-3.5 w-3.5" />
@@ -12053,8 +11990,7 @@ onUnmounted(() => {
                             {{ t("settings.mcpDeepSeekHarnessConfigPath") }}
                           </div>
                           <div class="relative rounded-md border bg-background p-3">
-                            <pre class="overflow-x-auto whitespace-pre text-xs leading-relaxed"><code>{{
-                mcpDeepSeekHarnessRecommendedConfig }}</code></pre>
+                            <pre class="overflow-x-auto whitespace-pre text-xs leading-relaxed"><code>{{ mcpDeepSeekHarnessRecommendedConfig }}</code></pre>
                             <Button type="button" variant="outline" size="icon" class="absolute right-2 top-2 h-7 w-7" :title="t('common.copy')" @click="copyMcpText('deepseek-harness-config', mcpDeepSeekHarnessRecommendedConfig)">
                               <CheckCircle2 v-if="mcpCopied === 'deepseek-harness-config'" class="h-3.5 w-3.5 text-green-500" />
                               <Copy v-else class="h-3.5 w-3.5" />
@@ -12069,8 +12005,7 @@ onUnmounted(() => {
                             {{ t("settings.mcpOpenCodeConfigPath") }}
                           </div>
                           <div class="relative rounded-md border bg-background p-3">
-                            <pre class="overflow-x-auto whitespace-pre text-xs leading-relaxed"><code>{{ mcpOpenCodeRecommendedConfig
-                }}</code></pre>
+                            <pre class="overflow-x-auto whitespace-pre text-xs leading-relaxed"><code>{{ mcpOpenCodeRecommendedConfig }}</code></pre>
                             <Button type="button" variant="outline" size="icon" class="absolute right-2 top-2 h-7 w-7" :title="t('common.copy')" @click="copyMcpText('opencode-config', mcpOpenCodeRecommendedConfig)">
                               <CheckCircle2 v-if="mcpCopied === 'opencode-config'" class="h-3.5 w-3.5 text-green-500" />
                               <Copy v-else class="h-3.5 w-3.5" />
@@ -12085,8 +12020,7 @@ onUnmounted(() => {
                             {{ t("settings.mcpPiConfigPath") }}
                           </div>
                           <div class="relative rounded-md border bg-background p-3">
-                            <pre class="overflow-x-auto whitespace-pre text-xs leading-relaxed"><code>{{ mcpPiRecommendedConfig
-                }}</code></pre>
+                            <pre class="overflow-x-auto whitespace-pre text-xs leading-relaxed"><code>{{ mcpPiRecommendedConfig }}</code></pre>
                             <Button type="button" variant="outline" size="icon" class="absolute right-2 top-2 h-7 w-7" :title="t('common.copy')" @click="copyMcpText('pi-config', mcpPiRecommendedConfig)">
                               <CheckCircle2 v-if="mcpCopied === 'pi-config'" class="h-3.5 w-3.5 text-green-500" />
                               <Copy v-else class="h-3.5 w-3.5" />
@@ -12101,8 +12035,7 @@ onUnmounted(() => {
                             {{ t("settings.mcpCherryStudioConfigPath") }}
                           </div>
                           <div class="relative rounded-md border bg-background p-3">
-                            <pre class="overflow-x-auto whitespace-pre text-xs leading-relaxed"><code>{{
-                mcpCherryStudioRecommendedConfig }}</code></pre>
+                            <pre class="overflow-x-auto whitespace-pre text-xs leading-relaxed"><code>{{ mcpCherryStudioRecommendedConfig }}</code></pre>
                             <Button type="button" variant="outline" size="icon" class="absolute right-2 top-2 h-7 w-7" :title="t('common.copy')" @click="copyMcpText('cherry-studio-config', mcpCherryStudioRecommendedConfig)">
                               <CheckCircle2 v-if="mcpCopied === 'cherry-studio-config'" class="h-3.5 w-3.5 text-green-500" />
                               <Copy v-else class="h-3.5 w-3.5" />
@@ -12117,8 +12050,7 @@ onUnmounted(() => {
                             {{ t("settings.mcpQoderConfigPath") }}
                           </div>
                           <div class="relative rounded-md border bg-background p-3">
-                            <pre class="overflow-x-auto whitespace-pre text-xs leading-relaxed"><code>{{ mcpQoderRecommendedConfig
-                }}</code></pre>
+                            <pre class="overflow-x-auto whitespace-pre text-xs leading-relaxed"><code>{{ mcpQoderRecommendedConfig }}</code></pre>
                             <Button type="button" variant="outline" size="icon" class="absolute right-2 top-2 h-7 w-7" :title="t('common.copy')" @click="copyMcpText('qoder-config', mcpQoderRecommendedConfig)">
                               <CheckCircle2 v-if="mcpCopied === 'qoder-config'" class="h-3.5 w-3.5 text-green-500" />
                               <Copy v-else class="h-3.5 w-3.5" />
@@ -12133,8 +12065,7 @@ onUnmounted(() => {
                             {{ t("settings.mcpWorkBuddyConfigPath") }}
                           </div>
                           <div class="relative rounded-md border bg-background p-3">
-                            <pre class="overflow-x-auto whitespace-pre text-xs leading-relaxed"><code>{{ mcpWorkBuddyRecommendedConfig
-                }}</code></pre>
+                            <pre class="overflow-x-auto whitespace-pre text-xs leading-relaxed"><code>{{ mcpWorkBuddyRecommendedConfig }}</code></pre>
                             <Button type="button" variant="outline" size="icon" class="absolute right-2 top-2 h-7 w-7" :title="t('common.copy')" @click="copyMcpText('workbuddy-config', mcpWorkBuddyRecommendedConfig)">
                               <CheckCircle2 v-if="mcpCopied === 'workbuddy-config'" class="h-3.5 w-3.5 text-green-500" />
                               <Copy v-else class="h-3.5 w-3.5" />
@@ -12252,9 +12183,7 @@ onUnmounted(() => {
                   <p class="text-sm text-muted-foreground">{{ t("settings.updateDownloadSourceDescription") }}</p>
                 </div>
                 <Select :model-value="editUpdateDownloadSource" @update:model-value="onUpdateDownloadSourceChange">
-                  <SelectTrigger class="h-9 w-full sm:w-[180px]">
-                    <SelectValue />
-                  </SelectTrigger>
+                  <SelectTrigger class="h-9 w-full sm:w-[180px]"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="official">{{ t("settings.updateDownloadSourceOfficial") }}</SelectItem>
                     <SelectItem value="cnb">{{ t("settings.updateDownloadSourceCnb") }}</SelectItem>
@@ -12458,12 +12387,7 @@ onUnmounted(() => {
             <!-- 行内冲突说明收进浮层后，“应用为何被禁用”需要一处常驻解释。 -->
             <span v-if="hasBlockingShortcutConflicts" class="inline-flex items-center gap-1.5 text-xs text-destructive">
               <AlertTriangle class="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-              {{
-                t("settings.shortcutConflictBlocksApply", {
-                  count: shortcutConflicts.length,
-                  pairs: shortcutConflictPairCount,
-                })
-              }}
+              {{ t("settings.shortcutConflictBlocksApply", { count: shortcutConflicts.length, pairs: shortcutConflictPairCount }) }}
             </span>
             <div class="flex-1" />
             <Button variant="outline" @click="closeSettings">
@@ -12709,7 +12633,7 @@ onUnmounted(() => {
           <!-- Built-in count: read-only SQL -->
           <div v-else-if="sqlShortcutFormIsBuiltin" class="flex flex-col gap-1.5">
             <Label>{{ t("settings.sqlShortcutsSql") }}</Label>
-            <pre class="overflow-x-auto whitespace-pre-wrap rounded-md border bg-muted/30 px-3 py-2 font-mono text-xs leading-relaxed">          {{ sqlShortcutForm.sql }}</pre>
+            <pre class="overflow-x-auto whitespace-pre-wrap rounded-md border bg-muted/30 px-3 py-2 font-mono text-xs leading-relaxed">{{ sqlShortcutForm.sql }}</pre>
             <p class="text-xs text-muted-foreground">
               {{ t("settings.sqlShortcutsVariableHint", { token: SQL_SHORTCUT_TABLE_TOKEN }) }}
             </p>
