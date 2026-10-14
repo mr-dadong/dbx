@@ -372,13 +372,13 @@ fn build_codebuddy_command_with_mcp_arg(
 }
 
 pub fn build_codebuddy_prompt(system_prompt: &str, messages: &[crate::ai::AiMessage], allow_write_sql: bool) -> String {
-    build_cli_agent_prompt("CodeBuddy Code", system_prompt, messages, allow_write_sql)
+    build_cli_agent_prompt("CodeBuddy Code CLI", system_prompt, messages, allow_write_sql)
 }
 
 pub async fn list_codebuddy_models(config: &AiConfig) -> Result<Vec<AiModelInfo>, String> {
     let initialized = initialize_codebuddy(config).await?;
     if initialized.authenticated == Some(false) {
-        return Err("[codeBuddyNotAuthenticated] CodeBuddy Code is not authenticated. Open `codebuddy` in a terminal, sign in, and try again.".to_string());
+        return Err("[codeBuddyNotAuthenticated] CodeBuddy Code CLI is not authenticated. Open `codebuddy` in a terminal, sign in, and try again.".to_string());
     }
     if initialized.models.is_empty() {
         return Err("[codeBuddyProtocolError] CodeBuddy initialization returned no usable models.".to_string());
@@ -801,7 +801,7 @@ pub async fn test_codebuddy_connection(config: &AiConfig) -> Result<AiTestConnec
     let start = Instant::now();
     let initialized = initialize_codebuddy(config).await?;
     if initialized.authenticated == Some(false) {
-        return Err("[codeBuddyNotAuthenticated] CodeBuddy Code is not authenticated. Open `codebuddy` in a terminal, sign in, and try again.".to_string());
+        return Err("[codeBuddyNotAuthenticated] CodeBuddy Code CLI is not authenticated. Open `codebuddy` in a terminal, sign in, and try again.".to_string());
     }
     probe_codebuddy_authentication(config).await?;
     let elapsed = start.elapsed().as_millis() as u64;
