@@ -34,7 +34,7 @@ impl CodeBuddyIsolatedCwd {
     fn create() -> Result<Self, String> {
         let path = env::temp_dir().join(format!("dbx-codebuddy-{}", uuid::Uuid::new_v4()));
         std::fs::create_dir(&path).map_err(|error| {
-            format!("[codeBuddyRunFailed] Failed to create isolated CodeBuddy Code directory: {error}")
+            format!("[codeBuddyRunFailed] Failed to create isolated CodeBuddy Code CLI directory: {error}")
         })?;
         Ok(Self { path })
     }
